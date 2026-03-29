@@ -1,0 +1,65 @@
+<resources>
+    <string name="app_name">Digital Detox</string>
+    <string name="accessibility_service_description">Digital Detox monitors which apps you open to help you be more mindful about your screen time. It shows a brief pause screen when you open monitored apps, giving you a moment to decide if you truly want to continue.</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">Take Back Your Time</string>
+    <string name="onboarding_welcome_subtitle">Digital Detox helps you break the cycle of mindless scrolling by adding a moment of conscious choice before you open distracting apps.</string>
+    <string name="onboarding_permissions_title">We Need a Few Permissions</string>
+    <string name="onboarding_apps_title">Choose Apps to Monitor</string>
+    <string name="onboarding_message_title">Write Your First Message</string>
+    <string name="onboarding_message_hint">Write something that will make you think twice...</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Dashboard</string>
+    <string name="today_screen_time">Today\'s Screen Time</string>
+    <string name="opens_today">Opens Today</string>
+    <string name="mindful_exits">Mindful Exits</string>
+    <string name="time_saved">Time Saved</string>
+    <string name="this_week">This Week</string>
+    <string name="app_breakdown">App Breakdown</string>
+
+    <!-- Navigation -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_apps">Apps</string>
+    <string name="nav_messages">Messages</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- App Selector -->
+    <string name="search_apps">Search apps...</string>
+    <string name="suggested_apps">Suggested</string>
+    <string name="all_installed_apps">All Installed Apps</string>
+
+    <!-- Messages -->
+    <string name="add_message">Add Message</string>
+    <string name="edit_message">Edit Message</string>
+    <string name="message_hint">Enter your message...</string>
+    <string name="time_range">Time Range</string>
+    <string name="all_day">All day</string>
+    <string name="empty_messages">No messages yet.\nAdd one to remind yourself why you\'re here.</string>
+
+    <!-- Settings -->
+    <string name="protection_active">Protection Active</string>
+    <string name="protection_inactive">Protection Inactive</string>
+    <string name="timing_section">Timing</string>
+    <string name="cooldown_duration">Cooldown Duration</string>
+    <string name="smart_escalation">Smart Escalation</string>
+    <string name="smart_escalation_desc">Longer wait times as you open apps more often</string>
+    <string name="night_mode_section">Night Mode</string>
+    <string name="late_night_mode">Late Night Mode</string>
+    <string name="late_night_mode_desc">Double cooldown during late hours</string>
+    <string name="session_section">Session Monitoring</string>
+    <string name="session_nudge">Session Nudge</string>
+    <string name="session_nudge_desc">Remind you after extended use</string>
+    <string name="permissions_section">Permissions</string>
+    <string name="grant">Grant</string>
+    <string name="granted">Granted</string>
+
+    <!-- Overlay -->
+    <string name="breathe">Breathe...</string>
+    <string name="go_back">Go Back</string>
+    <string name="continue_mindfully">Continue</string>
+    <string name="opens_format">%d opens today</string>
+    <string name="time_today_format">%s today</string>
+    <string name="time_week_format">%s this week</string>
+</resources>

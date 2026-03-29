@@ -8,6 +8,15 @@ android {
     namespace = "com.sanson.digitaldetox"
     compileSdk = 36
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("../keystore.jks")
+            storePassword = "12341234"
+            keyAlias = "digitaldetox"
+            keyPassword = "12341234"
+        }
+    }
+
     defaultConfig {
         applicationId = "com.sanson.digitaldetox"
         minSdk = 26
@@ -21,6 +30,8 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

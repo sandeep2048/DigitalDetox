@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -38,7 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -64,9 +62,13 @@ fun InterventionOverlay(
 
     LaunchedEffect(Unit) {
         contentVisible = true
+        if (data.cooldownSeconds <= 0) return@LaunchedEffect
+        // Wall-clock countdown — immune to delay(1000) jitter/drift
+        val startMs = System.currentTimeMillis()
         while (timeRemaining > 0) {
-            delay(1000)
-            timeRemaining--
+            delay(200L) // poll every 200 ms for a smooth countdown display
+            val elapsedSec = ((System.currentTimeMillis() - startMs) / 1000L).toInt()
+            timeRemaining = maxOf(0, data.cooldownSeconds - elapsedSec)
         }
     }
 

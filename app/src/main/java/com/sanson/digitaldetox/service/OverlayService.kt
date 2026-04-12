@@ -10,7 +10,6 @@ import android.graphics.PixelFormat
 import android.os.IBinder
 import android.view.Gravity
 import android.view.WindowManager
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.Lifecycle
@@ -36,7 +35,6 @@ import com.sanson.digitaldetox.util.Constants
 import com.sanson.digitaldetox.util.PreferenceManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
@@ -182,9 +180,13 @@ class OverlayService : Service() {
             sessionStartTime = System.currentTimeMillis()
             usageRepository.logEvent(pkg, UsageLogEntity.EVENT_CONTINUED)
             DetoxAccessibilityService.instance?.onOverlayDismissed()
-            DetoxAccessibilityService.instance?.onTimerStarted(pkg)
             removeOverlayView()
-            showTimerView(nudgeMinutes)
+            // Only start the floating timer when the user has the feature enabled
+            val nudgeEnabled = preferenceManager.isSessionNudgeEnabled.first()
+            if (nudgeEnabled && nudgeMinutes > 0) {
+                DetoxAccessibilityService.instance?.onTimerStarted(pkg)
+                showTimerView(nudgeMinutes)
+            }
         }
     }
 
@@ -234,7 +236,10 @@ class OverlayService : Service() {
                     CountdownTimerOverlay(
                         totalSeconds = totalSeconds,
                         onTimerFinished = {
-                            scope.launch { onNudgeTimerExpired() }
+                            // timerView == null means cancelTimer() already ran; do nothing
+                            if (timerView != null) {
+                                scope.launch { onNudgeTimerExpired() }
+                            }
                         }
                     )
                 }
@@ -244,15 +249,13 @@ class OverlayService : Service() {
         windowManager?.addView(timerView, params)
     }
 
-    private fun onNudgeTimerExpired() {
+    private suspend fun onNudgeTimerExpired() {
         val pkg = currentPackage ?: return
+        val elapsed = System.currentTimeMillis() - sessionStartTime
         removeTimerView()
-        scope.launch {
-            val elapsed = System.currentTimeMillis() - sessionStartTime
-            usageRepository.logEvent(pkg, UsageLogEntity.EVENT_SESSION_NUDGE, elapsed)
-            sessionStartTime = 0
-            prepareAndShowOverlay(pkg, currentAppNameOverride)
-        }
+        usageRepository.logEvent(pkg, UsageLogEntity.EVENT_SESSION_NUDGE, elapsed)
+        sessionStartTime = 0
+        prepareAndShowOverlay(pkg, currentAppNameOverride)
     }
 
     // ── View Cleanup ──
@@ -354,7 +357,17 @@ class OverlayLifecycleOwner : LifecycleOwner, SavedStateRegistryOwner {
 
     fun onDestroy() {
         if (isCreated) {
-            lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+            try {
+                // LifecycleRegistry requires sequential state transitions; skip directly
+                // from RESUMED → DESTROYED is illegal and causes crashes/corruption.
+                if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                    lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+                }
+                if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                    lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+                }
+                lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+            } catch (_: Exception) {}
             isCreated = false
         }
     }

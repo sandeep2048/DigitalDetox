@@ -35,17 +35,26 @@ fun CountdownTimerOverlay(
     totalSeconds: Int,
     onTimerFinished: () -> Unit
 ) {
-    var secondsRemaining by remember { mutableIntStateOf(totalSeconds) }
+    // Key on totalSeconds so the state resets if the value changes on recomposition
+    var secondsRemaining by remember(totalSeconds) { mutableIntStateOf(totalSeconds) }
+
     val progress by animateFloatAsState(
-        targetValue = secondsRemaining.toFloat() / totalSeconds,
-        animationSpec = tween(durationMillis = 1000, easing = LinearEasing),
+        targetValue = if (totalSeconds > 0) secondsRemaining.toFloat() / totalSeconds else 0f,
+        animationSpec = tween(durationMillis = 900, easing = LinearEasing),
         label = "progress"
     )
 
-    LaunchedEffect(Unit) {
+    // Wall-clock countdown — not susceptible to delay(1000) drift
+    LaunchedEffect(totalSeconds) {
+        if (totalSeconds <= 0) {
+            onTimerFinished()
+            return@LaunchedEffect
+        }
+        val startMs = System.currentTimeMillis()
         while (secondsRemaining > 0) {
-            delay(1000)
-            secondsRemaining--
+            delay(200L) // poll every 200 ms for a smooth display
+            val elapsedSec = ((System.currentTimeMillis() - startMs) / 1000L).toInt()
+            secondsRemaining = maxOf(0, totalSeconds - elapsedSec)
         }
         onTimerFinished()
     }

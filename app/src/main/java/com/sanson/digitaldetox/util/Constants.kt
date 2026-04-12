@@ -19,6 +19,7 @@ object Constants {
 
     const val ACTION_SHOW_OVERLAY = "com.sanson.digitaldetox.SHOW_OVERLAY"
     const val ACTION_DISMISS_OVERLAY = "com.sanson.digitaldetox.DISMISS_OVERLAY"
+    const val ACTION_CANCEL_TIMER = "com.sanson.digitaldetox.CANCEL_TIMER"
     const val EXTRA_PACKAGE_NAME = "extra_package_name"
     const val EXTRA_APP_NAME = "extra_app_name"
 

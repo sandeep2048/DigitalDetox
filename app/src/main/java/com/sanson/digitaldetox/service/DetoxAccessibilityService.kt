@@ -22,6 +22,9 @@ class DetoxAccessibilityService : AccessibilityService() {
     private var currentForegroundPackage: String? = null
     private var overlayShowing = false
 
+    // Which package the countdown timer is running for
+    private var timerActiveForPackage: String? = null
+
     // Browser URL monitoring
     private var lastBrowserOverlayDomain: String? = null
 
@@ -46,12 +49,12 @@ class DetoxAccessibilityService : AccessibilityService() {
         if (event == null) return
         val packageName = event.packageName?.toString() ?: return
 
+        // Ignore our own app
         if (packageName == applicationContext.packageName) return
-        if (packageName == "com.android.systemui") return
 
         when (event.eventType) {
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
-                handleWindowChange(event, packageName)
+                handleWindowChange(packageName)
             }
             AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {
                 if (packageName in Constants.BROWSER_PACKAGES) {
@@ -61,31 +64,56 @@ class DetoxAccessibilityService : AccessibilityService() {
         }
     }
 
-    private fun handleWindowChange(event: AccessibilityEvent, packageName: String) {
-        val className = event.className?.toString() ?: return
+    private fun handleWindowChange(packageName: String) {
+        // Only act when the foreground PACKAGE actually changes
+        if (packageName == currentForegroundPackage) return
 
-        if (packageName.contains("launcher")) return
-        if (!className.contains(".") || className.startsWith("android.")) return
+        val previousPackage = currentForegroundPackage
+        currentForegroundPackage = packageName
 
-        if (packageName != currentForegroundPackage) {
-            // User switched to a DIFFERENT app — reset tracking
-            currentForegroundPackage = packageName
-            lastBrowserOverlayDomain = null
+        // ── Step 1: Cancel timer if user left the monitored app ──
+        if (timerActiveForPackage != null && packageName != timerActiveForPackage) {
+            cancelTimer()
+            timerActiveForPackage = null
+        }
 
-            // For browser apps, check URL instead of package
-            if (packageName in Constants.BROWSER_PACKAGES) {
-                handleBrowserContentChange(packageName)
-                return
-            }
+        // ── Step 2: Reset browser domain tracking on any package change ──
+        lastBrowserOverlayDomain = null
 
-            if (overlayShowing) return
+        // ── Step 3: Don't show overlays for system packages ──
+        if (isSystemPackage(packageName)) return
 
-            scope.launch {
-                if (appRepository.isMonitored(packageName)) {
-                    showOverlay(packageName)
-                }
+        // ── Step 4: For browsers, check URL ──
+        if (packageName in Constants.BROWSER_PACKAGES) {
+            handleBrowserContentChange(packageName)
+            return
+        }
+
+        // ── Step 5: If overlay is already showing, don't stack another ──
+        if (overlayShowing) return
+
+        // ── Step 6: Check if this app is monitored and show overlay ──
+        scope.launch {
+            if (appRepository.isMonitored(packageName)) {
+                showOverlay(packageName)
             }
         }
+    }
+
+    private fun isSystemPackage(packageName: String): Boolean {
+        return packageName == "com.android.systemui" ||
+                packageName.contains("launcher") ||
+                packageName == "com.android.settings" ||
+                packageName == "com.android.packageinstaller"
+    }
+
+    private fun cancelTimer() {
+        try {
+            val intent = Intent(applicationContext, OverlayService::class.java).apply {
+                action = Constants.ACTION_CANCEL_TIMER
+            }
+            applicationContext.startService(intent)
+        } catch (_: Exception) {}
     }
 
     private fun handleBrowserContentChange(browserPackage: String) {
@@ -100,14 +128,12 @@ class DetoxAccessibilityService : AccessibilityService() {
         val matchedDomain = Constants.MONITORED_DOMAINS.firstOrNull { domain ->
             url.contains(domain, ignoreCase = true)
         } ?: run {
-            // User navigated away from a monitored domain — reset so next visit triggers
             if (lastBrowserOverlayDomain != null) {
                 lastBrowserOverlayDomain = null
             }
             return
         }
 
-        // Only skip if we already showed for THIS exact domain in THIS browser session
         if (matchedDomain == lastBrowserOverlayDomain) return
 
         lastBrowserOverlayDomain = matchedDomain
@@ -189,9 +215,14 @@ class DetoxAccessibilityService : AccessibilityService() {
         overlayShowing = false
     }
 
+    fun onTimerStarted(packageName: String) {
+        timerActiveForPackage = packageName
+    }
+
     fun resetCurrentPackage() {
         currentForegroundPackage = null
         lastBrowserOverlayDomain = null
+        timerActiveForPackage = null
     }
 
     fun goHome() {

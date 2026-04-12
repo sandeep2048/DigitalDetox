@@ -92,6 +92,11 @@ class OverlayService : Service() {
                 removeOverlayView()
                 removeTimerView()
             }
+            Constants.ACTION_CANCEL_TIMER -> {
+                // User left the monitored app — kill the floating timer
+                removeTimerView()
+                logSessionDurationIfNeeded()
+            }
         }
         return START_STICKY
     }
@@ -177,6 +182,7 @@ class OverlayService : Service() {
             sessionStartTime = System.currentTimeMillis()
             usageRepository.logEvent(pkg, UsageLogEntity.EVENT_CONTINUED)
             DetoxAccessibilityService.instance?.onOverlayDismissed()
+            DetoxAccessibilityService.instance?.onTimerStarted(pkg)
             removeOverlayView()
             showTimerView(nudgeMinutes)
         }

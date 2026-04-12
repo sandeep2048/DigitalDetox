@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="108" height="108">
+  <!--
+    Digital Detox — App Icon (SVG master)
+    ==============================================
+    Concept : A white leaf with a phone cutout.
+              The green bg shows through the phone,
+              symbolising nature reclaiming screen time.
+    Colours : bg #43A047 → #1B5E20 (radial),  fg #FFFFFF
+  -->
+
+  <!-- Background: forest-green radial gradient -->
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#43A047"/>
+      <stop offset="100%" stop-color="#1B5E20"/>
+    </radialGradient>
+
+    <!-- Clip to rounded-square (adaptive-icon safe zone) -->
+    <clipPath id="iconClip">
+      <rect x="0" y="0" width="108" height="108" rx="24" ry="24"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#iconClip)">
+    <!-- Background -->
+    <rect width="108" height="108" fill="url(#bgGrad)"/>
+
+    <!--
+      Leaf silhouette with phone-shape punched out (even-odd fill rule).
+      Leaf  : teardrop centred at (54,52), tip at (54,86), crown at (54,18)
+      Phone : rounded-rect from (46,40) to (62,72)
+    -->
+    <path
+      fill="#FFFFFF"
+      fill-rule="evenodd"
+      d="
+        M54,86
+        C72,72 80,56 80,44
+        C80,30 68,18 54,18
+        C40,18 28,30 28,44
+        C28,56 36,72 54,86 Z
+
+        M46,43
+        Q46,40 49,40
+        L59,40
+        Q62,40 62,43
+        L62,69
+        Q62,72 59,72
+        L49,72
+        Q46,72 46,69 Z
+      "/>
+
+    <!-- Leaf centre vein (above phone hole) -->
+    <line x1="54" y1="22" x2="54" y2="38"
+          stroke="rgba(255,255,255,0.38)" stroke-width="1.8"
+          stroke-linecap="round"/>
+
+    <!-- Leaf centre vein (below phone hole) -->
+    <line x1="54" y1="74" x2="54" y2="82"
+          stroke="rgba(255,255,255,0.38)" stroke-width="1.8"
+          stroke-linecap="round"/>
+
+    <!-- Speaker bar (inside phone hole – white on green) -->
+    <line x1="50" y1="44.5" x2="58" y2="44.5"
+          stroke="rgba(255,255,255,0.74)" stroke-width="2"
+          stroke-linecap="round"/>
+
+    <!-- Home-button bar (inside phone hole) -->
+    <line x1="51" y1="68" x2="57" y2="68"
+          stroke="rgba(255,255,255,0.74)" stroke-width="2"
+          stroke-linecap="round"/>
+  </g>
+</svg>
+

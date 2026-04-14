@@ -1,8 +1,8 @@
 package com.sanson.digitaldetox.ui.screens.messages
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.Schedule
@@ -44,6 +43,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -63,50 +64,95 @@ fun MessageEditorScreen(
                 onClick = { showAddDialog = true },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(18.dp)
             ) {
                 Icon(Icons.Filled.Add, contentDescription = "Add message")
             }
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Color(0xFF090A16), Color(0xFF101224), MaterialTheme.colorScheme.background)
+                    )
+                )
                 .padding(padding)
-                .padding(horizontal = 20.dp)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp)
+            ) {
+                Spacer(modifier = Modifier.height(18.dp))
 
-            Text(
-                text = "Your Messages",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
+                Text(
+                    text = "Messages",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Write messages that can interrupt autopilot when the block screen appears.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
 
-            Text(
-                text = "${messages.size} messages",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+                Spacer(modifier = Modifier.height(18.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (messages.isEmpty()) {
-                EmptyMessagesState()
-            } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.80f),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f))
                 ) {
-                    items(messages, key = { it.id }) { message ->
-                        MessageCard(
-                            message = message,
-                            onToggle = { viewModel.toggleActive(message) },
-                            onDelete = { viewModel.deleteMessage(message.id) }
+                    Row(
+                        modifier = Modifier.padding(horizontal = 18.dp, vertical = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(
+                                text = "Active reminders",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "${messages.count { it.isActive }} of ${messages.size} enabled",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Text(
+                            text = "${messages.size}",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
-                    item { Spacer(modifier = Modifier.height(80.dp)) }
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                if (messages.isEmpty()) {
+                    EmptyMessagesState()
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(messages, key = { it.id }) { message ->
+                            MessageCard(
+                                message = message,
+                                onToggle = { viewModel.toggleActive(message) },
+                                onDelete = { viewModel.deleteMessage(message.id) }
+                            )
+                        }
+                        item { Spacer(modifier = Modifier.height(90.dp)) }
+                    }
                 }
             }
         }
@@ -131,24 +177,31 @@ private fun MessageCard(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = if (message.isActive)
-            MaterialTheme.colorScheme.surfaceVariant
-        else
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+        shape = RoundedCornerShape(20.dp),
+        color = if (message.isActive) {
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.78f)
+        } else {
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
+        },
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f))
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.Top
         ) {
-            Icon(
-                imageVector = Icons.Filled.FormatQuote,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary.copy(
-                    alpha = if (message.isActive) 1f else 0.4f
-                ),
-                modifier = Modifier.size(20.dp)
-            )
+            Surface(
+                shape = RoundedCornerShape(14.dp),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = if (message.isActive) 0.14f else 0.08f)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.FormatQuote,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = if (message.isActive) 1f else 0.45f),
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .size(18.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.width(12.dp))
 
@@ -157,12 +210,12 @@ private fun MessageCard(
                     text = message.message,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface.copy(
-                        alpha = if (message.isActive) 1f else 0.5f
+                        alpha = if (message.isActive) 1f else 0.56f
                     )
                 )
 
                 if (message.timeRangeStart != null && message.timeRangeEnd != null) {
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Filled.Schedule,
@@ -194,12 +247,12 @@ private fun MessageCard(
                 )
                 IconButton(
                     onClick = onDelete,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(34.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Delete,
                         contentDescription = "Delete",
-                        tint = MaterialTheme.colorScheme.error.copy(alpha = 0.6f),
+                        tint = MaterialTheme.colorScheme.error.copy(alpha = 0.72f),
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -214,25 +267,36 @@ private fun EmptyMessagesState() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                imageVector = Icons.Filled.FormatQuote,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
-                modifier = Modifier.size(64.dp)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "No messages yet",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = "Add a message to remind yourself\nwhy you're here.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                textAlign = TextAlign.Center
-            )
+        Surface(
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.75f),
+            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f))
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(horizontal = 28.dp, vertical = 32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.FormatQuote,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.55f),
+                    modifier = Modifier.size(56.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "No messages yet",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = "Add a message that reminds future-you why this pause matters.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.82f),
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
@@ -264,11 +328,13 @@ private fun AddMessageDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(120.dp),
-                    placeholder = { Text("Your message to yourself...") },
-                    shape = RoundedCornerShape(12.dp),
+                    placeholder = { Text("Write something future-you needs to hear…") },
+                    shape = RoundedCornerShape(14.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.20f)
                     )
                 )
 

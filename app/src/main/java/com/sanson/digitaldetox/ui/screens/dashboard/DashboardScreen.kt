@@ -1,5 +1,6 @@
 package com.sanson.digitaldetox.ui.screens.dashboard
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +18,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.FrontHand
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Schedule
@@ -32,9 +32,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.sanson.digitaldetox.data.model.AppUsageStats
 import com.sanson.digitaldetox.ui.components.StatCard
 import com.sanson.digitaldetox.ui.components.UsageBarChart
 import com.sanson.digitaldetox.ui.theme.Primary
@@ -56,30 +58,41 @@ fun DashboardScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Color(0xFF090A16), Color(0xFF0F1122), MaterialTheme.colorScheme.background)
+                )
+            )
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
-        // Header
         Text(
             text = "Good ${getGreeting()},",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
+            text = "Here is your mindful snapshot",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
             text = LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMM d")),
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Hero card — today's total screen time
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
-            color = MaterialTheme.colorScheme.surface
+            shape = RoundedCornerShape(28.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.82f),
+            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f))
         ) {
             Box(
                 modifier = Modifier
@@ -87,8 +100,9 @@ fun DashboardScreen(
                     .background(
                         Brush.linearGradient(
                             colors = listOf(
-                                PrimaryDark.copy(alpha = 0.3f),
-                                Primary.copy(alpha = 0.1f)
+                                PrimaryDark.copy(alpha = 0.34f),
+                                Primary.copy(alpha = 0.14f),
+                                Color.Transparent
                             )
                         )
                     )
@@ -96,18 +110,18 @@ fun DashboardScreen(
             ) {
                 Column {
                     Text(
-                        text = "Today's Screen Time",
+                        text = "Today’s screen time",
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = TimeUtils.formatDuration(state.totalTimeToday),
                         style = MaterialTheme.typography.displayMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = "${TimeUtils.formatDuration(state.totalTimeWeek)} this week",
                         style = MaterialTheme.typography.bodyMedium,
@@ -117,22 +131,21 @@ fun DashboardScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
-        // Stat cards row
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             StatCard(
-                title = "Opens",
+                title = "opens today",
                 value = "${state.totalOpensToday}",
                 icon = Icons.Filled.OpenInBrowser,
                 iconTint = Tertiary,
                 modifier = Modifier.weight(1f)
             )
             StatCard(
-                title = "Mindful Exits",
+                title = "mindful exits",
                 value = "${state.mindfulExitsToday}",
                 icon = Icons.Filled.FrontHand,
                 iconTint = Secondary,
@@ -140,79 +153,109 @@ fun DashboardScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(26.dp))
 
-        // Weekly chart
-        Text(
-            text = "This Week",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onBackground
+        SectionTitle(
+            title = "Weekly rhythm",
+            subtitle = "A calmer view of your last seven days"
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant
+            shape = RoundedCornerShape(22.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.76f),
+            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f))
         ) {
-            Box(modifier = Modifier.padding(16.dp)) {
+            Box(modifier = Modifier.padding(18.dp)) {
                 if (state.weeklyStats.isNotEmpty()) {
                     UsageBarChart(dailyStats = state.weeklyStats)
                 } else {
                     Text(
-                        text = "No data yet. Stats will appear after your first day.",
+                        text = "No data yet. Your weekly pattern will appear after some usage.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(vertical = 32.dp)
+                        modifier = Modifier.padding(vertical = 36.dp)
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(26.dp))
 
-        // Per-app breakdown
+        SectionTitle(
+            title = "App breakdown",
+            subtitle = "Where your attention went today"
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
         if (state.perAppStats.isNotEmpty()) {
-            Text(
-                text = "App Breakdown",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
             state.perAppStats
                 .sortedByDescending { it.timeSpentTodayMs }
                 .forEach { appStat ->
                     AppBreakdownItem(appStat = appStat)
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
+        } else {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f),
+                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f))
+            ) {
+                Text(
+                    text = "No monitored app sessions yet today.",
+                    modifier = Modifier.padding(18.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
 
-        Spacer(modifier = Modifier.height(100.dp))
+        Spacer(modifier = Modifier.height(110.dp))
     }
 }
 
 @Composable
-private fun AppBreakdownItem(appStat: com.sanson.digitaldetox.data.model.AppUsageStats) {
+private fun SectionTitle(
+    title: String,
+    subtitle: String
+) {
+    Column {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = subtitle,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun AppBreakdownItem(appStat: AppUsageStats) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant
+        shape = RoundedCornerShape(18.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // App icon placeholder
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(44.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -229,20 +272,31 @@ private fun AppBreakdownItem(appStat: com.sanson.digitaldetox.data.model.AppUsag
                 Text(
                     text = appStat.appName,
                     style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Text(
-                    text = "${appStat.opensToday} opens today",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    androidx.compose.material3.Icon(
+                        imageVector = Icons.Filled.Schedule,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "${appStat.opensToday} opens today",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
 
             Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = TimeUtils.formatDuration(appStat.timeSpentTodayMs),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(

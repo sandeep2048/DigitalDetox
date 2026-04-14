@@ -56,6 +56,7 @@ class OverlayService : Service() {
     private var currentPackage: String? = null
     private var currentAppNameOverride: String? = null
     private var sessionStartTime: Long = 0
+    private var activeTimerToken: Long = 0
 
     private lateinit var usageRepository: UsageRepository
     private lateinit var messageRepository: MessageRepository
@@ -123,6 +124,7 @@ class OverlayService : Service() {
         }
 
         val nudgeMinutes = preferenceManager.sessionNudgeMinutes.first()
+        val intentCounts = usageRepository.getIntentCountsToday(packageName)
 
         val data = OverlayData(
             customMessage = messageText,
@@ -132,7 +134,8 @@ class OverlayService : Service() {
             cooldownSeconds = cooldown,
             packageName = packageName,
             appName = appName,
-            nudgeAfterMinutes = nudgeMinutes
+            nudgeAfterMinutes = nudgeMinutes,
+            intentCountsToday = intentCounts
         )
 
         showFullOverlay(data)
@@ -164,7 +167,9 @@ class OverlayService : Service() {
                 DigitalDetoxTheme(darkTheme = true) {
                     InterventionOverlay(
                         data = data,
-                        onContinue = { handleContinue(data.nudgeAfterMinutes) },
+                        onContinue = { intentPurpose ->
+                            handleContinue(data.nudgeAfterMinutes, intentPurpose)
+                        },
                         onGoBack = { handleGoBack() }
                     )
                 }
@@ -174,11 +179,11 @@ class OverlayService : Service() {
         windowManager?.addView(overlayView, params)
     }
 
-    private fun handleContinue(nudgeMinutes: Int) {
+    private fun handleContinue(nudgeMinutes: Int, intentPurpose: String) {
         val pkg = currentPackage ?: return
         scope.launch {
             sessionStartTime = System.currentTimeMillis()
-            usageRepository.logEvent(pkg, UsageLogEntity.EVENT_CONTINUED)
+            usageRepository.logEvent(pkg, UsageLogEntity.continuedIntentEvent(intentPurpose))
             DetoxAccessibilityService.instance?.onOverlayDismissed()
             removeOverlayView()
             // Only start the floating timer when the user has the feature enabled
@@ -213,6 +218,8 @@ class OverlayService : Service() {
         timerLifecycle.onResume()
 
         val totalSeconds = nudgeMinutes * 60
+        val timerToken = System.currentTimeMillis()
+        activeTimerToken = timerToken
 
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -237,8 +244,8 @@ class OverlayService : Service() {
                         totalSeconds = totalSeconds,
                         onTimerFinished = {
                             // timerView == null means cancelTimer() already ran; do nothing
-                            if (timerView != null) {
-                                scope.launch { onNudgeTimerExpired() }
+                            if (timerView != null && timerToken == activeTimerToken) {
+                                scope.launch { onNudgeTimerExpired(timerToken) }
                             }
                         }
                     )
@@ -249,7 +256,8 @@ class OverlayService : Service() {
         windowManager?.addView(timerView, params)
     }
 
-    private suspend fun onNudgeTimerExpired() {
+    private suspend fun onNudgeTimerExpired(timerToken: Long) {
+        if (timerToken != activeTimerToken) return
         val pkg = currentPackage ?: return
         val elapsed = System.currentTimeMillis() - sessionStartTime
         removeTimerView()
@@ -273,6 +281,7 @@ class OverlayService : Service() {
             timerView?.let { windowManager?.removeView(it) }
         } catch (_: Exception) {}
         timerView = null
+        activeTimerToken = 0
         timerLifecycle.onDestroy()
     }
 

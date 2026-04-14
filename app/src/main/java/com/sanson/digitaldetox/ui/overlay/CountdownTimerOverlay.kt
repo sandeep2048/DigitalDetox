@@ -3,25 +3,30 @@ package com.sanson.digitaldetox.ui.overlay
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,6 +42,8 @@ fun CountdownTimerOverlay(
 ) {
     // Key on totalSeconds so the state resets if the value changes on recomposition
     var secondsRemaining by remember(totalSeconds) { mutableIntStateOf(totalSeconds) }
+    var callbackFired by remember(totalSeconds) { mutableStateOf(false) }
+    val retroFont = FontFamily.Monospace
 
     val progress by animateFloatAsState(
         targetValue = if (totalSeconds > 0) secondsRemaining.toFloat() / totalSeconds else 0f,
@@ -47,7 +54,10 @@ fun CountdownTimerOverlay(
     // Wall-clock countdown — not susceptible to delay(1000) drift
     LaunchedEffect(totalSeconds) {
         if (totalSeconds <= 0) {
-            onTimerFinished()
+            if (!callbackFired) {
+                callbackFired = true
+                onTimerFinished()
+            }
             return@LaunchedEffect
         }
         val startMs = System.currentTimeMillis()
@@ -56,7 +66,10 @@ fun CountdownTimerOverlay(
             val elapsedSec = ((System.currentTimeMillis() - startMs) / 1000L).toInt()
             secondsRemaining = maxOf(0, totalSeconds - elapsedSec)
         }
-        onTimerFinished()
+        if (!callbackFired) {
+            callbackFired = true
+            onTimerFinished()
+        }
     }
 
     val minutes = secondsRemaining / 60
@@ -70,42 +83,49 @@ fun CountdownTimerOverlay(
         else -> ErrorColor
     }
 
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xE6101020))
-            .padding(10.dp),
-        contentAlignment = Alignment.Center
+    Surface(
+        shape = RoundedCornerShape(10.dp),
+        color = Color(0xE60D1611),
+        border = BorderStroke(1.dp, Color(0xFF2CEB7E).copy(alpha = 0.75f))
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(2.dp)
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.size(48.dp)
-            ) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.size(44.dp)) {
                 CircularProgressIndicator(
                     progress = { progress },
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(44.dp),
                     color = timerColor,
-                    trackColor = Color.White.copy(alpha = 0.1f),
+                    trackColor = Color(0xFF1E3A2A),
                     strokeWidth = 3.dp
                 )
                 Text(
                     text = timeText,
-                    fontSize = 12.sp,
+                    fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    letterSpacing = 0.5.sp
+                    color = Color(0xFFE5FFEF),
+                    fontFamily = retroFont
                 )
             }
-            Text(
-                text = "nudge",
-                fontSize = 9.sp,
-                color = Color.White.copy(alpha = 0.5f),
-                fontWeight = FontWeight.Medium
-            )
+
+            Column(verticalArrangement = Arrangement.Center) {
+                Text(
+                    text = "SESSION ACTIVE",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Color(0xFFE5FFEF),
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = retroFont
+                )
+                Spacer(modifier = Modifier.size(2.dp))
+                Text(
+                    text = "NEXT CHECK-IN SOON",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color(0xFF9BD5B4),
+                    fontFamily = retroFont
+                )
+            }
         }
     }
 }

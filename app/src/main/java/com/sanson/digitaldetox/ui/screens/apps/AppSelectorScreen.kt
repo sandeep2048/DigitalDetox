@@ -1,13 +1,11 @@
 package com.sanson.digitaldetox.ui.screens.apps
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,18 +38,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sanson.digitaldetox.ui.theme.ErrorColor
-import com.sanson.digitaldetox.ui.theme.Primary
 import com.sanson.digitaldetox.ui.theme.PrimaryDark
 import com.sanson.digitaldetox.ui.theme.Secondary
 import com.sanson.digitaldetox.util.Constants
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AppSelectorScreen(
     viewModel: AppSelectorViewModel = viewModel()
@@ -67,41 +63,44 @@ fun AppSelectorScreen(
     } else {
         installedApps.filter {
             it.appName.contains(searchQuery, ignoreCase = true) ||
-                    it.packageName.contains(searchQuery, ignoreCase = true)
+                it.packageName.contains(searchQuery, ignoreCase = true)
         }
     }
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Color(0xFF090A16), Color(0xFF0E1020), MaterialTheme.colorScheme.background)
+                )
+            )
             .padding(horizontal = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp)
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         item {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(18.dp))
 
             Text(
-                text = "Monitored Apps",
-                style = MaterialTheme.typography.headlineMedium,
+                text = "Apps",
+                style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
             )
-
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "${monitoredPackages.size} apps being monitored",
+                text = "${monitoredPackages.size} apps protected with mindful pauses",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
-        }
+            Spacer(modifier = Modifier.height(18.dp))
 
-        // ── Social Media Section ──
-        item {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                color = MaterialTheme.colorScheme.surface
+                shape = RoundedCornerShape(24.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.82f),
+                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f))
             ) {
                 Column(
                     modifier = Modifier
@@ -109,8 +108,9 @@ fun AppSelectorScreen(
                         .background(
                             Brush.linearGradient(
                                 colors = listOf(
-                                    ErrorColor.copy(alpha = 0.08f),
-                                    PrimaryDark.copy(alpha = 0.06f)
+                                    ErrorColor.copy(alpha = 0.12f),
+                                    PrimaryDark.copy(alpha = 0.10f),
+                                    Color.Transparent
                                 )
                             )
                         )
@@ -124,23 +124,22 @@ fun AppSelectorScreen(
                             modifier = Modifier.size(22.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Social Media",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                        Column {
+                            Text(
+                                text = "Social protection",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "Blocks in-app scrolling and browser detours",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
 
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = "Blocked in-app AND in any browser",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
 
                     Constants.SOCIAL_MEDIA_BLOCKS.forEach { block ->
                         val isEnabled = block.packageName in monitoredPackages
@@ -151,21 +150,23 @@ fun AppSelectorScreen(
                                 viewModel.toggleApp(block.packageName, block.name, enabled)
                             }
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-        }
+            Spacer(modifier = Modifier.height(14.dp))
 
-        // ── Search + All Apps ──
-        item {
             Text(
-                text = "All Installed Apps",
+                text = "Installed apps",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onBackground
+            )
+            Text(
+                text = "Choose additional apps to monitor",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -174,21 +175,21 @@ fun AppSelectorScreen(
                 value = searchQuery,
                 onValueChange = { viewModel.updateSearch(it) },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Search apps...") },
+                placeholder = { Text("Search apps…") },
                 leadingIcon = {
                     Icon(Icons.Filled.Search, contentDescription = null)
                 },
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(18.dp),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.10f),
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
                 )
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
         }
 
         items(filteredApps, key = { it.packageName }) { app ->
@@ -202,7 +203,7 @@ fun AppSelectorScreen(
             )
         }
 
-        item { Spacer(modifier = Modifier.height(100.dp)) }
+        item { Spacer(modifier = Modifier.height(110.dp)) }
     }
 }
 
@@ -212,34 +213,30 @@ private fun SocialBlockCard(
     isEnabled: Boolean,
     onToggle: (Boolean) -> Unit
 ) {
-    val borderColor = if (isEnabled) Secondary else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-    val bgColor = if (isEnabled)
-        Secondary.copy(alpha = 0.08f)
-    else
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+    val borderColor = if (isEnabled) Secondary else Color.White.copy(alpha = 0.06f)
+    val bgColor = if (isEnabled) {
+        Secondary.copy(alpha = 0.10f)
+    } else {
+        MaterialTheme.colorScheme.surface.copy(alpha = 0.28f)
+    }
 
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .border(
-                width = 1.5.dp,
-                color = borderColor,
-                shape = RoundedCornerShape(16.dp)
-            ),
-        shape = RoundedCornerShape(16.dp),
+            .border(1.dp, borderColor, RoundedCornerShape(18.dp)),
+        shape = RoundedCornerShape(18.dp),
         color = bgColor
     ) {
         Row(
             modifier = Modifier.padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icon/emoji badge
             Box(
                 modifier = Modifier
-                    .size(44.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .size(46.dp)
+                    .clip(RoundedCornerShape(14.dp))
                     .background(
-                        if (isEnabled) Secondary.copy(alpha = 0.15f)
+                        if (isEnabled) Secondary.copy(alpha = 0.16f)
                         else MaterialTheme.colorScheme.surfaceVariant
                     ),
                 contentAlignment = Alignment.Center
@@ -248,8 +245,7 @@ private fun SocialBlockCard(
                     text = block.emoji,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.ExtraBold,
-                    color = if (isEnabled) Secondary
-                    else MaterialTheme.colorScheme.onSurfaceVariant
+                    color = if (isEnabled) Secondary else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -273,12 +269,12 @@ private fun SocialBlockCard(
                         )
                     }
                 }
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = block.description,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                // Browser domains
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(top = 4.dp)
@@ -286,14 +282,14 @@ private fun SocialBlockCard(
                     Icon(
                         imageVector = Icons.Filled.Language,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f),
                         modifier = Modifier.size(12.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = block.domains.take(2).joinToString(", "),
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.58f),
                         fontSize = 10.sp
                     )
                 }
@@ -304,7 +300,7 @@ private fun SocialBlockCard(
                 onCheckedChange = onToggle,
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = Secondary,
-                    checkedTrackColor = Secondary.copy(alpha = 0.3f),
+                    checkedTrackColor = Secondary.copy(alpha = 0.35f),
                     uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
                 )
@@ -322,19 +318,20 @@ private fun AppRow(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(18.dp),
         color = if (isMonitored)
-            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.34f)
         else
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.62f),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = if (isMonitored) 0.09f else 0.05f))
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(42.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center
@@ -353,12 +350,14 @@ private fun AppRow(
                 Text(
                     text = appName,
                     style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = packageName,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.72f),
                     maxLines = 1
                 )
             }

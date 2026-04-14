@@ -23,6 +23,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -35,7 +37,7 @@ fun UsageBarChart(
     modifier: Modifier = Modifier
 ) {
     val maxDuration = dailyStats.maxOfOrNull { it.totalDurationMs } ?: 1L
-    val maxBarHeight = 120.dp
+    val maxBarHeight = 140.dp
     var animate by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { animate = true }
@@ -43,7 +45,7 @@ fun UsageBarChart(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp),
+            .padding(horizontal = 4.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.Bottom
     ) {
@@ -51,14 +53,14 @@ fun UsageBarChart(
             val fraction = if (maxDuration > 0) stat.totalDurationMs.toFloat() / maxDuration else 0f
             val animatedFraction by animateFloatAsState(
                 targetValue = if (animate) fraction else 0f,
-                animationSpec = tween(durationMillis = 800),
+                animationSpec = tween(durationMillis = 850),
                 label = "barAnimation"
             )
             val isToday = TimeUtils.getDayLabel(stat.dayTimestamp) == "Today"
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
                     text = TimeUtils.formatDurationShort(stat.totalDurationMs),
@@ -69,14 +71,36 @@ fun UsageBarChart(
                 )
                 Box(
                     modifier = Modifier
-                        .width(32.dp)
-                        .height(maxBarHeight * animatedFraction.coerceAtLeast(0.02f))
-                        .clip(RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp))
-                        .background(
-                            if (isToday) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
-                        )
-                )
+                        .width(28.dp)
+                        .height(maxBarHeight)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color.White.copy(alpha = 0.06f)),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .width(28.dp)
+                            .height(maxBarHeight * animatedFraction.coerceAtLeast(0.03f))
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(
+                                if (isToday) {
+                                    Brush.verticalGradient(
+                                        listOf(
+                                            MaterialTheme.colorScheme.primary,
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.75f)
+                                        )
+                                    )
+                                } else {
+                                    Brush.verticalGradient(
+                                        listOf(
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.22f)
+                                        )
+                                    )
+                                }
+                            )
+                    )
+                }
                 Text(
                     text = TimeUtils.getDayShortLabel(stat.dayTimestamp),
                     style = MaterialTheme.typography.labelSmall,

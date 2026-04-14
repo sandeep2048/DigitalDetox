@@ -3,7 +3,9 @@ package com.sanson.digitaldetox.ui.overlay
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,7 +16,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccessTime
@@ -37,15 +42,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.sanson.digitaldetox.R
+import com.sanson.digitaldetox.data.db.entity.UsageLogEntity
 import com.sanson.digitaldetox.data.model.OverlayData
 import com.sanson.digitaldetox.ui.components.BreathingAnimation
-import com.sanson.digitaldetox.ui.theme.OverlayBackground
-import com.sanson.digitaldetox.ui.theme.OverlayCard
+import com.sanson.digitaldetox.ui.theme.Primary
 import com.sanson.digitaldetox.ui.theme.Secondary
 import com.sanson.digitaldetox.util.TimeUtils
 import kotlinx.coroutines.delay
@@ -53,20 +62,40 @@ import kotlinx.coroutines.delay
 @Composable
 fun InterventionOverlay(
     data: OverlayData,
-    onContinue: () -> Unit,
+    onContinue: (String) -> Unit,
     onGoBack: () -> Unit
 ) {
     var timeRemaining by remember { mutableIntStateOf(data.cooldownSeconds) }
     var contentVisible by remember { mutableStateOf(false) }
+    var selectedIntent by remember { mutableStateOf<String?>(null) }
     val timerFinished = timeRemaining <= 0
+
+    val retroFont = FontFamily.Monospace
+    val intents = listOf(
+        IntentOption(
+            key = UsageLogEntity.INTENT_SUBCONSCIOUS,
+            label = stringResource(id = R.string.intent_subconscious)
+        ),
+        IntentOption(
+            key = UsageLogEntity.INTENT_WORK,
+            label = stringResource(id = R.string.intent_work)
+        ),
+        IntentOption(
+            key = UsageLogEntity.INTENT_BORED,
+            label = stringResource(id = R.string.intent_bored)
+        ),
+        IntentOption(
+            key = UsageLogEntity.INTENT_URGENT,
+            label = stringResource(id = R.string.intent_urgent)
+        )
+    )
 
     LaunchedEffect(Unit) {
         contentVisible = true
         if (data.cooldownSeconds <= 0) return@LaunchedEffect
-        // Wall-clock countdown — immune to delay(1000) jitter/drift
         val startMs = System.currentTimeMillis()
         while (timeRemaining > 0) {
-            delay(200L) // poll every 200 ms for a smooth countdown display
+            delay(200L)
             val elapsedSec = ((System.currentTimeMillis() - startMs) / 1000L).toInt()
             timeRemaining = maxOf(0, data.cooldownSeconds - elapsedSec)
         }
@@ -75,150 +104,237 @@ fun InterventionOverlay(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(OverlayBackground),
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Color(0xFF050609), Color(0xFF0B1A12), Color(0xFF050609))
+                )
+            ),
         contentAlignment = Alignment.Center
     ) {
         AnimatedVisibility(
             visible = contentVisible,
-            enter = fadeIn() + slideInVertically(initialOffsetY = { it / 6 })
+            enter = fadeIn() + slideInVertically(initialOffsetY = { it / 8 })
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 20.dp, vertical = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // App name chip
                 Surface(
-                    shape = RoundedCornerShape(20.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+                    shape = RoundedCornerShape(10.dp),
+                    color = Color(0xFF10251A),
+                    border = BorderStroke(1.dp, Color(0xFF2CEB7E))
                 ) {
                     Text(
-                        text = data.appName,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                        text = data.appName.uppercase(),
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = Color(0xFF95FFBE),
+                        fontFamily = retroFont,
+                        letterSpacing = MaterialTheme.typography.labelLarge.letterSpacing
                     )
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                // Breathing animation
-                BreathingAnimation()
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                // Custom message
                 Text(
-                    text = data.customMessage,
+                    text = stringResource(id = R.string.overlay_pause_title).uppercase(),
                     style = MaterialTheme.typography.headlineSmall,
-                    color = Color.White,
+                    color = Color(0xFFE5FFEF),
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = retroFont
                 )
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                // Stats row
+                Text(
+                    text = data.customMessage,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color(0xFFC6F3D7),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    fontFamily = retroFont
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
                 Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = OverlayCard
+                    shape = RoundedCornerShape(10.dp),
+                    color = Color(0xFF0D1611),
+                    border = BorderStroke(1.dp, Color(0xFF2CEB7E).copy(alpha = 0.6f))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(18.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        BreathingAnimation()
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        if (!timerFinished) {
+                            CircularProgressIndicator(
+                                progress = {
+                                    if (data.cooldownSeconds > 0) {
+                                        timeRemaining.toFloat() / data.cooldownSeconds
+                                    } else 0f
+                                },
+                                modifier = Modifier.size(70.dp),
+                                color = Primary,
+                                trackColor = Color(0xFF1E3A2A),
+                                strokeWidth = 5.dp
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Text(
+                                text = "$timeRemaining",
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = Color(0xFFE5FFEF),
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = retroFont
+                            )
+                            Text(
+                                text = stringResource(id = R.string.breathe),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color(0xFF95FFBE),
+                                fontFamily = retroFont
+                            )
+                        } else {
+                            Text(
+                                text = stringResource(id = R.string.intent_check_title).uppercase(),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = Color(0xFFE5FFEF),
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                                fontFamily = retroFont
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = stringResource(id = R.string.intent_check_hint, data.appName),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color(0xFFB1EBC8),
+                                textAlign = TextAlign.Center,
+                                fontFamily = retroFont
+                            )
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            intents.chunked(2).forEach { rowIntents ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    rowIntents.forEach { intentOption ->
+                                        IntentOptionCard(
+                                            label = intentOption.label,
+                                            countToday = data.intentCountsToday[intentOption.key] ?: 0,
+                                            isSelected = selectedIntent == intentOption.key,
+                                            onClick = { selectedIntent = intentOption.key },
+                                            fontFamily = retroFont,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    }
+                                    if (rowIntents.size == 1) {
+                                        Spacer(modifier = Modifier.weight(1f))
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+
+                            if (selectedIntent == null) {
+                                Text(
+                                    text = stringResource(id = R.string.intent_check_required),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color(0xFFFFB4AB),
+                                    fontFamily = retroFont
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Surface(
+                    shape = RoundedCornerShape(10.dp),
+                    color = Color(0xFF0D1611),
+                    border = BorderStroke(1.dp, Color(0xFF2CEB7E).copy(alpha = 0.35f))
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(vertical = 14.dp, horizontal = 10.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         OverlayStat(
                             icon = Icons.Filled.Repeat,
                             value = "${data.opensToday}",
-                            label = "opens today"
+                            label = stringResource(id = R.string.overlay_opens_today_label),
+                            fontFamily = retroFont
                         )
                         OverlayStat(
                             icon = Icons.Filled.AccessTime,
                             value = TimeUtils.formatDuration(data.timeSpentTodayMs),
-                            label = "today"
+                            label = stringResource(id = R.string.overlay_today_label),
+                            fontFamily = retroFont
                         )
                         OverlayStat(
                             icon = Icons.Filled.Timeline,
                             value = TimeUtils.formatDuration(data.timeSpentWeekMs),
-                            label = "this week"
+                            label = stringResource(id = R.string.overlay_this_week_label),
+                            fontFamily = retroFont
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                // Timer or ready state
-                if (!timerFinished) {
-                    Box(contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(
-                            progress = { timeRemaining.toFloat() / data.cooldownSeconds },
-                            modifier = Modifier.size(64.dp),
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                            strokeWidth = 4.dp
-                        )
-                        Text(
-                            text = "$timeRemaining",
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = Color.White.copy(alpha = 0.7f),
-                            fontWeight = FontWeight.Light
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text(
-                        text = "Breathe...",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color.White.copy(alpha = 0.5f)
+                Button(
+                    onClick = onGoBack,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(54.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Secondary, contentColor = Color(0xFF07140C))
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
                     )
-                } else {
-                    // Action buttons
-                    Button(
-                        onClick = onGoBack,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Secondary
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.size(8.dp))
-                        Text(
-                            text = "Go Back",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(id = R.string.go_back).uppercase(),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = retroFont
+                    )
+                }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
-                    OutlinedButton(
-                        onClick = onContinue,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color.White.copy(alpha = 0.5f)
-                        )
-                    ) {
-                        Text(
-                            text = "Continue anyway (nudge in ${data.nudgeAfterMinutes}m)",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                OutlinedButton(
+                    onClick = { selectedIntent?.let(onContinue) },
+                    enabled = timerFinished && selectedIntent != null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color(0xFFE5FFEF)
+                    ),
+                    border = BorderStroke(1.dp, Color(0xFF2CEB7E))
+                ) {
+                    Text(
+                        text = stringResource(
+                            id = R.string.continue_nudge_format,
+                            data.nudgeAfterMinutes
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontFamily = retroFont,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
@@ -229,28 +345,75 @@ fun InterventionOverlay(
 private fun OverlayStat(
     icon: ImageVector,
     value: String,
-    label: String
+    label: String,
+    fontFamily: FontFamily
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(3.dp)
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = Color.White.copy(alpha = 0.5f),
+            tint = Color(0xFF95FFBE),
             modifier = Modifier.size(16.dp)
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.titleMedium,
-            color = Color.White,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.titleSmall,
+            color = Color(0xFFE5FFEF),
+            fontWeight = FontWeight.Bold,
+            fontFamily = fontFamily
         )
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall,
-            color = Color.White.copy(alpha = 0.5f)
+            color = Color(0xFF9BD5B4),
+            fontFamily = fontFamily
         )
+    }
+}
+
+private data class IntentOption(
+    val key: String,
+    val label: String
+)
+
+@Composable
+private fun IntentOptionCard(
+    label: String,
+    countToday: Int,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    fontFamily: FontFamily,
+    modifier: Modifier = Modifier
+) {
+    val borderColor = if (isSelected) Color(0xFF2CEB7E) else Color(0xFF2A4A37)
+    val bgColor = if (isSelected) Color(0xFF143325) else Color(0xFF0B1510)
+
+    Surface(
+        modifier = modifier.clickable(onClick = onClick),
+        shape = RoundedCornerShape(8.dp),
+        color = bgColor,
+        border = BorderStroke(1.dp, borderColor)
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = Color(0xFFE5FFEF),
+                fontFamily = fontFamily,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = stringResource(R.string.intent_count_for_app, countToday),
+                style = MaterialTheme.typography.labelSmall,
+                color = Color(0xFF9BD5B4),
+                fontFamily = fontFamily
+            )
+        }
     }
 }

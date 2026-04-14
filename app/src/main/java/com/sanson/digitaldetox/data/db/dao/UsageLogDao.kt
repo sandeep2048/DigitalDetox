@@ -6,6 +6,11 @@ import androidx.room.Query
 import com.sanson.digitaldetox.data.db.entity.UsageLogEntity
 import kotlinx.coroutines.flow.Flow
 
+data class EventTypeCount(
+    val eventType: String,
+    val count: Int
+)
+
 @Dao
 interface UsageLogDao {
 
@@ -55,6 +60,15 @@ interface UsageLogDao {
         AND timestamp >= :since
     """)
     suspend fun getOpenedPackagesSince(since: Long): List<String>
+
+    @Query("""
+        SELECT eventType, COUNT(*) AS count FROM usage_logs
+        WHERE packageName = :packageName
+        AND timestamp >= :since
+        AND eventType LIKE 'CONTINUED:%'
+        GROUP BY eventType
+    """)
+    suspend fun getContinuedIntentCountsSince(packageName: String, since: Long): List<EventTypeCount>
 
     @Query("""
         SELECT COUNT(*) FROM usage_logs

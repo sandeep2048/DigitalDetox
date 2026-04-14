@@ -17,5 +17,17 @@ data class UsageLogEntity(
         const val EVENT_CONTINUED = "CONTINUED"
         const val EVENT_EXITED = "EXITED"
         const val EVENT_SESSION_NUDGE = "SESSION_NUDGE"
+
+        const val INTENT_SUBCONSCIOUS = "subconscious"
+        const val INTENT_WORK = "work"
+        const val INTENT_BORED = "bored"
+        const val INTENT_URGENT = "urgent"
+
+        fun continuedIntentEvent(intentKey: String): String = "$EVENT_CONTINUED:$intentKey"
+
+        fun intentKeyFromEvent(eventType: String): String? {
+            if (!eventType.startsWith("$EVENT_CONTINUED:")) return null
+            return eventType.substringAfter(':').ifBlank { null }
+        }
     }
 }

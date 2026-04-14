@@ -23,5 +23,6 @@ data class OverlayData(
     val cooldownSeconds: Int,
     val packageName: String,
     val appName: String,
-    val nudgeAfterMinutes: Int = 5
+    val nudgeAfterMinutes: Int = 5,
+    val intentCountsToday: Map<String, Int> = emptyMap()
 )

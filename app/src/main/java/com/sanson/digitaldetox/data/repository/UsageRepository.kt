@@ -45,6 +45,13 @@ class UsageRepository(
         return usageLogDao.getTotalDurationSince(packageName, TimeUtils.startOfWeek())
     }
 
+    suspend fun getIntentCountsToday(packageName: String): Map<String, Int> {
+        val rows = usageLogDao.getContinuedIntentCountsSince(packageName, TimeUtils.startOfToday())
+        return rows.mapNotNull { row ->
+            UsageLogEntity.intentKeyFromEvent(row.eventType)?.let { key -> key to row.count }
+        }.toMap()
+    }
+
     suspend fun getTotalTimeSpentThisWeek(): Long {
         return usageLogDao.getTotalDurationAllAppsSince(TimeUtils.startOfWeek())
     }

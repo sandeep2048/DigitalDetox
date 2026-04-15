@@ -8,98 +8,69 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+
+// Game Boy DMG palette
+private val GBLightest = Color(0xFF9BBC0F)
+private val GBDarkest  = Color(0xFF0F380F)
+private val GBDark     = Color(0xFF306230)
 
 @Composable
 fun BreathingAnimation(
     modifier: Modifier = Modifier,
-    primaryColor: Color = MaterialTheme.colorScheme.primary,
-    secondaryColor: Color = MaterialTheme.colorScheme.secondary
+    @Suppress("UNUSED_PARAMETER") primaryColor: Color = GBDarkest,
+    @Suppress("UNUSED_PARAMETER") secondaryColor: Color = GBDark
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "breathing")
 
     val scale by infiniteTransition.animateFloat(
-        initialValue = 0.6f,
-        targetValue = 1.0f,
+        initialValue = 0.4f,
+        targetValue = 0.85f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 4000, easing = LinearEasing),
+            animation = tween(durationMillis = 3000, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "scale"
     )
 
-    val alpha by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 0.8f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 4000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "alpha"
-    )
+    // Pixel-art pulsing grid — feels like a Game Boy sprite
+    Canvas(modifier = modifier.size(100.dp)) {
+        val pixelSize = size.minDimension / 10f
+        val cx = size.width / 2f
+        val cy = size.height / 2f
+        val gridCount = (10 * scale).toInt().coerceIn(2, 8)
+        val half = gridCount / 2f
 
-    val outerAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.05f,
-        targetValue = 0.2f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 4000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "outerAlpha"
-    )
-
-    Canvas(modifier = modifier.size(160.dp)) {
-        val center = Offset(size.width / 2, size.height / 2)
-        val maxRadius = size.minDimension / 2
-
-        // Outer glow ring
-        drawCircle(
-            brush = Brush.radialGradient(
-                colors = listOf(
-                    primaryColor.copy(alpha = outerAlpha),
-                    Color.Transparent
-                ),
-                center = center,
-                radius = maxRadius
-            ),
-            radius = maxRadius,
-            center = center
+        // Draw outer border square
+        val outerSize = pixelSize * 10
+        val outerOff = (size.width - outerSize) / 2f
+        drawRect(
+            color = GBDark.copy(alpha = 0.3f),
+            topLeft = Offset(outerOff, outerOff),
+            size = Size(outerSize, outerSize)
         )
 
-        // Middle ring
-        drawCircle(
-            color = primaryColor.copy(alpha = alpha * 0.3f),
-            radius = maxRadius * scale * 0.85f,
-            center = center
-        )
-
-        // Inner core
-        drawCircle(
-            brush = Brush.radialGradient(
-                colors = listOf(
-                    primaryColor.copy(alpha = alpha),
-                    secondaryColor.copy(alpha = alpha * 0.6f),
-                    Color.Transparent
-                ),
-                center = center,
-                radius = maxRadius * scale * 0.6f
-            ),
-            radius = maxRadius * scale * 0.6f,
-            center = center
-        )
-
-        // Bright center dot
-        drawCircle(
-            color = Color.White.copy(alpha = alpha * 0.9f),
-            radius = maxRadius * 0.08f,
-            center = center
-        )
+        // Draw pulsing pixel grid
+        for (row in 0 until gridCount) {
+            for (col in 0 until gridCount) {
+                val x = cx - half * pixelSize + col * pixelSize
+                val y = cy - half * pixelSize + row * pixelSize
+                // Diamond mask for a classic sprite shape
+                val distFromCenter = kotlin.math.abs(row - half + 0.5f) + kotlin.math.abs(col - half + 0.5f)
+                if (distFromCenter <= half) {
+                    drawRect(
+                        color = GBDarkest,
+                        topLeft = Offset(x, y),
+                        size = Size(pixelSize - 1f, pixelSize - 1f)
+                    )
+                }
+            }
+        }
     }
 }

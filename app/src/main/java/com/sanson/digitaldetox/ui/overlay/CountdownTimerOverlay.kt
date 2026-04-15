@@ -3,18 +3,20 @@ package com.sanson.digitaldetox.ui.overlay
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,14 +27,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.sanson.digitaldetox.ui.theme.ErrorColor
+import com.sanson.digitaldetox.ui.theme.GBDark
+import com.sanson.digitaldetox.ui.theme.GBDarkest
+import com.sanson.digitaldetox.ui.theme.GBLight
+import com.sanson.digitaldetox.ui.theme.GBLightest
 import com.sanson.digitaldetox.ui.theme.PixelFont
-import com.sanson.digitaldetox.ui.theme.Primary
 import kotlinx.coroutines.delay
 import java.util.Locale
 
@@ -41,10 +43,8 @@ fun CountdownTimerOverlay(
     totalSeconds: Int,
     onTimerFinished: () -> Unit
 ) {
-    // Key on totalSeconds so the state resets if the value changes on recomposition
     var secondsRemaining by remember(totalSeconds) { mutableIntStateOf(totalSeconds) }
     var callbackFired by remember(totalSeconds) { mutableStateOf(false) }
-    val retroFont = PixelFont
 
     val progress by animateFloatAsState(
         targetValue = if (totalSeconds > 0) secondsRemaining.toFloat() / totalSeconds else 0f,
@@ -52,80 +52,75 @@ fun CountdownTimerOverlay(
         label = "progress"
     )
 
-    // Wall-clock countdown — not susceptible to delay(1000) drift
     LaunchedEffect(totalSeconds) {
         if (totalSeconds <= 0) {
-            if (!callbackFired) {
-                callbackFired = true
-                onTimerFinished()
-            }
+            if (!callbackFired) { callbackFired = true; onTimerFinished() }
             return@LaunchedEffect
         }
         val startMs = System.currentTimeMillis()
         while (secondsRemaining > 0) {
-            delay(200L) // poll every 200 ms for a smooth display
+            delay(200L)
             val elapsedSec = ((System.currentTimeMillis() - startMs) / 1000L).toInt()
             secondsRemaining = maxOf(0, totalSeconds - elapsedSec)
         }
-        if (!callbackFired) {
-            callbackFired = true
-            onTimerFinished()
-        }
+        if (!callbackFired) { callbackFired = true; onTimerFinished() }
     }
 
     val minutes = secondsRemaining / 60
     val seconds = secondsRemaining % 60
     val timeText = String.format(Locale.US, "%d:%02d", minutes, seconds)
 
-    // Color transitions: green → yellow → red as time runs out
-    val timerColor = when {
-        secondsRemaining > totalSeconds * 0.3f -> Primary
-        secondsRemaining > totalSeconds * 0.1f -> Color(0xFFFFB347)
-        else -> ErrorColor
-    }
-
-    Surface(
-        shape = RoundedCornerShape(10.dp),
-        color = Color(0xE6182E22),
-        border = BorderStroke(1.dp, Color(0xFF2CEB7E).copy(alpha = 0.75f))
+    // Game Boy style floating chip
+    Box(
+        modifier = Modifier
+            .border(2.dp, GBDarkest, RoundedCornerShape(4.dp))
+            .background(GBLightest.copy(alpha = 0.96f), RoundedCornerShape(4.dp))
+            .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.size(44.dp)) {
-                CircularProgressIndicator(
-                    progress = { progress },
-                    modifier = Modifier.size(44.dp),
-                    color = timerColor,
-                    trackColor = Color(0xFF254836),
-                    strokeWidth = 3.dp
-                )
+            // Timer display box
+            Box(
+                modifier = Modifier
+                    .border(2.dp, GBDarkest, RoundedCornerShape(2.dp))
+                    .background(GBLight, RoundedCornerShape(2.dp))
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
                     text = timeText,
-                    fontSize = 11.sp,
+                    fontSize = 10.sp,
+                    fontFamily = PixelFont,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFFE5FFEF),
-                    fontFamily = retroFont
+                    color = GBDarkest
                 )
             }
 
             Column(verticalArrangement = Arrangement.Center) {
                 Text(
-                    text = "SESSION ACTIVE",
+                    text = "SESSION",
                     style = MaterialTheme.typography.labelMedium,
-                    color = Color(0xFFE5FFEF),
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = retroFont
+                    color = GBDarkest,
+                    fontWeight = FontWeight.Bold
                 )
-                Spacer(modifier = Modifier.size(2.dp))
-                Text(
-                    text = "NEXT CHECK-IN SOON",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color(0xFF9BD5B4),
-                    fontFamily = retroFont
-                )
+                Spacer(Modifier.size(1.dp))
+                // Mini progress bar
+                Box(
+                    modifier = Modifier
+                        .width(60.dp)
+                        .height(4.dp)
+                        .border(1.dp, GBDarkest, RoundedCornerShape(1.dp))
+                        .background(GBLight, RoundedCornerShape(1.dp))
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(progress)
+                            .height(4.dp)
+                            .background(GBDarkest, RoundedCornerShape(1.dp))
+                    )
+                }
             }
         }
     }

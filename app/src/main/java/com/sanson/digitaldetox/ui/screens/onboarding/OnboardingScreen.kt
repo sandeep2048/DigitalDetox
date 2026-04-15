@@ -138,7 +138,7 @@ fun OnboardingScreen(
                 OutlinedButton(
                     onClick = { currentStep-- },
                     modifier = Modifier.weight(1f).height(56.dp),
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(4.dp),
                     border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f))
                 ) {
                     Text("Back")
@@ -157,7 +157,7 @@ fun OnboardingScreen(
                     }
                 },
                 modifier = Modifier.weight(1f).height(56.dp),
-                shape = RoundedCornerShape(10.dp),
+                shape = RoundedCornerShape(4.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary

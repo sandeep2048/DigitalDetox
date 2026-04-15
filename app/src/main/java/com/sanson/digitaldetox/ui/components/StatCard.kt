@@ -33,7 +33,7 @@ fun StatCard(
 ) {
     Surface(
         modifier = modifier.widthIn(min = 120.dp),
-        shape = RoundedCornerShape(10.dp),
+        shape = RoundedCornerShape(4.dp),
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.94f),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.42f)),
         tonalElevation = 0.dp

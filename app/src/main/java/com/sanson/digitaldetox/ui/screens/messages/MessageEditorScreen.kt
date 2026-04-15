@@ -63,7 +63,7 @@ fun MessageEditorScreen(
                 onClick = { showAddDialog = true },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
-                shape = RoundedCornerShape(18.dp)
+                shape = RoundedCornerShape(4.dp)
             ) {
                 Icon(Icons.Filled.Add, contentDescription = "Add message")
             }
@@ -100,7 +100,7 @@ fun MessageEditorScreen(
 
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(4.dp),
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.94f),
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f))
                 ) {
@@ -172,7 +172,7 @@ private fun MessageCard(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp),
+        shape = RoundedCornerShape(4.dp),
         color = if (message.isActive) {
             MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.94f)
         } else {
@@ -263,7 +263,7 @@ private fun EmptyMessagesState() {
         contentAlignment = Alignment.Center
     ) {
         Surface(
-            shape = RoundedCornerShape(10.dp),
+            shape = RoundedCornerShape(4.dp),
             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.94f),
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f))
         ) {
@@ -359,7 +359,7 @@ private fun AddMessageDialog(
                             label = { Text("From") },
                             modifier = Modifier.weight(1f),
                             singleLine = true,
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(4.dp)
                         )
                         OutlinedTextField(
                             value = timeEnd,
@@ -367,7 +367,7 @@ private fun AddMessageDialog(
                             label = { Text("To") },
                             modifier = Modifier.weight(1f),
                             singleLine = true,
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(4.dp)
                         )
                     }
                 }

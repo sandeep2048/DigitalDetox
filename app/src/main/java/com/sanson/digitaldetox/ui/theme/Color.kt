@@ -2,62 +2,66 @@ package com.sanson.digitaldetox.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Primary palette — retro terminal green
-val Primary = Color(0xFF2CEB7E)
-val PrimaryLight = Color(0xFF95FFBE)
-val PrimaryDark = Color(0xFF1BAE5D)
-val PrimaryContainer = Color(0xFF123524)
-val OnPrimary = Color(0xFF07140C)
-val OnPrimaryContainer = Color(0xFFCFFFE2)
+// ══════════════════════════════════════════════════
+// GAME BOY DMG — authentic 4-shade LCD palette
+// ══════════════════════════════════════════════════
+val GBLightest = Color(0xFF9BBC0F)   // LCD background
+val GBLight    = Color(0xFF8BAC0F)   // lighter elements
+val GBDark     = Color(0xFF306230)   // dark UI elements
+val GBDarkest  = Color(0xFF0F380F)   // text / pixel ink
 
-// Secondary — bright phosphor accent
-val Secondary = Color(0xFF7CFFB0)
-val SecondaryLight = Color(0xFFBDFFD6)
-val SecondaryDark = Color(0xFF41D584)
-val SecondaryContainer = Color(0xFF173826)
-val OnSecondary = Color(0xFF092014)
-val OnSecondaryContainer = Color(0xFFCFFFE2)
+// Mapped to Material token names for theme wiring
+val Primary          = GBDarkest
+val PrimaryLight     = GBDark
+val PrimaryDark      = GBDarkest
+val PrimaryContainer = GBDark
+val OnPrimary        = GBLightest
+val OnPrimaryContainer = GBLightest
 
-// Tertiary — amber warning accent
-val Tertiary = Color(0xFFFFC857)
-val TertiaryContainer = Color(0xFF3B2A07)
-val OnTertiary = Color(0xFF261A03)
-val OnTertiaryContainer = Color(0xFFFFE6B6)
+val Secondary          = GBDark
+val SecondaryLight     = GBLight
+val SecondaryDark      = GBDarkest
+val SecondaryContainer = GBDark
+val OnSecondary        = GBLightest
+val OnSecondaryContainer = GBLightest
 
-// Error — readable red for alerts
-val ErrorColor = Color(0xFFFF7B72)
-val ErrorContainer = Color(0xFF3A1412)
-val OnError = Color(0xFF250907)
-val OnErrorContainer = Color(0xFFFFDAD6)
+val Tertiary            = GBDarkest
+val TertiaryContainer   = GBDark
+val OnTertiary          = GBLightest
+val OnTertiaryContainer = GBLightest
 
-// CRT black with green readable text
-val Background = Color(0xFF060C09)
-val Surface = Color(0xFF122018)
-val SurfaceVariant = Color(0xFF182E22)
-val SurfaceHigh = Color(0xFF1E3A2A)
-val SurfaceBright = Color(0xFF254836)
-val OnBackground = Color(0xFFE5FFEF)
-val OnSurface = Color(0xFFE5FFEF)
-val OnSurfaceVariant = Color(0xFFA8DDBC)
-val Outline = Color(0xFF3A6B50)
-val OutlineVariant = Color(0xFF254836)
+val ErrorColor      = Color(0xFF5A1010)  // muted dark red on LCD
+val ErrorContainer  = GBLight
+val OnError         = GBLightest
+val OnErrorContainer = GBDarkest
 
-// Light surfaces
-val LightBackground = Color(0xFFF2FFF7)
-val LightSurface = Color(0xFFFFFFFF)
-val LightSurfaceVariant = Color(0xFFE8F7EE)
-val LightSurfaceHigh = Color(0xFFDCEFE4)
-val LightOnBackground = Color(0xFF102019)
-val LightOnSurface = Color(0xFF102019)
-val LightOnSurfaceVariant = Color(0xFF2A5B41)
-val LightOutline = Color(0xFF9BC7AC)
+// Surfaces — LCD green shades
+val Background       = GBLightest
+val Surface          = GBLight
+val SurfaceVariant   = GBLight
+val SurfaceHigh      = GBDark
+val SurfaceBright    = GBLightest
+val OnBackground     = GBDarkest
+val OnSurface        = GBDarkest
+val OnSurfaceVariant = GBDark
+val Outline          = GBDark
+val OutlineVariant   = GBDark.copy(alpha = 0.5f)
 
-// Light containers
-val LightPrimaryContainer = Color(0xFFD6F7E3)
-val LightSecondaryContainer = Color(0xFFE1FBEA)
-val LightTertiaryContainer = Color(0xFFFFEDD0)
-val LightErrorContainer = Color(0xFFFFE0E0)
+// Light scheme (same for this monochrome theme)
+val LightBackground       = GBLightest
+val LightSurface          = GBLight
+val LightSurfaceVariant   = GBLight
+val LightSurfaceHigh      = GBDark
+val LightOnBackground     = GBDarkest
+val LightOnSurface        = GBDarkest
+val LightOnSurfaceVariant = GBDark
+val LightOutline          = GBDark
+
+val LightPrimaryContainer   = GBLight
+val LightSecondaryContainer = GBLight
+val LightTertiaryContainer  = GBLight
+val LightErrorContainer     = GBLight
 
 // Overlay
-val OverlayBackground = Color(0xF2060C09)
-val OverlayCard = Color(0xFF182E22)
+val OverlayBackground = GBLightest
+val OverlayCard       = GBLight

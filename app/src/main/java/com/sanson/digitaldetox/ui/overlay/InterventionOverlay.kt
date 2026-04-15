@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +28,6 @@ import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -42,7 +42,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -50,15 +49,25 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.sanson.digitaldetox.R
 import com.sanson.digitaldetox.data.db.entity.UsageLogEntity
 import com.sanson.digitaldetox.data.model.OverlayData
-import com.sanson.digitaldetox.ui.components.BreathingAnimation
+import com.sanson.digitaldetox.ui.theme.GBDark
+import com.sanson.digitaldetox.ui.theme.GBDarkest
+import com.sanson.digitaldetox.ui.theme.GBLight
+import com.sanson.digitaldetox.ui.theme.GBLightest
 import com.sanson.digitaldetox.ui.theme.PixelFont
-import com.sanson.digitaldetox.ui.theme.Primary
-import com.sanson.digitaldetox.ui.theme.Secondary
 import com.sanson.digitaldetox.util.TimeUtils
 import kotlinx.coroutines.delay
+
+// ═══════════════════════════════════════════════════
+//  Game Boy DMG LCD palette (4 shades)
+//  Lightest 0xFF9BBC0F  — LCD background
+//  Light    0xFF8BAC0F  — card / subtle bg
+//  Dark     0xFF306230  — borders / secondary
+//  Darkest  0xFF0F380F  — text / pixel ink
+// ═══════════════════════════════════════════════════
 
 @Composable
 fun InterventionOverlay(
@@ -71,24 +80,11 @@ fun InterventionOverlay(
     var selectedIntent by remember { mutableStateOf<String?>(null) }
     val timerFinished = timeRemaining <= 0
 
-    val retroFont = PixelFont
     val intents = listOf(
-        IntentOption(
-            key = UsageLogEntity.INTENT_SUBCONSCIOUS,
-            label = stringResource(id = R.string.intent_subconscious)
-        ),
-        IntentOption(
-            key = UsageLogEntity.INTENT_WORK,
-            label = stringResource(id = R.string.intent_work)
-        ),
-        IntentOption(
-            key = UsageLogEntity.INTENT_BORED,
-            label = stringResource(id = R.string.intent_bored)
-        ),
-        IntentOption(
-            key = UsageLogEntity.INTENT_URGENT,
-            label = stringResource(id = R.string.intent_urgent)
-        )
+        IntentOption(UsageLogEntity.INTENT_SUBCONSCIOUS, stringResource(R.string.intent_subconscious)),
+        IntentOption(UsageLogEntity.INTENT_WORK, stringResource(R.string.intent_work)),
+        IntentOption(UsageLogEntity.INTENT_BORED, stringResource(R.string.intent_bored)),
+        IntentOption(UsageLogEntity.INTENT_URGENT, stringResource(R.string.intent_urgent))
     )
 
     LaunchedEffect(Unit) {
@@ -102,14 +98,11 @@ fun InterventionOverlay(
         }
     }
 
+    // ── Full-screen LCD background ──
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFF060C09), Color(0xFF0E1E14), Color(0xFF060C09))
-                )
-            ),
+            .background(GBLightest),
         contentAlignment = Alignment.Center
     ) {
         AnimatedVisibility(
@@ -120,220 +113,214 @@ fun InterventionOverlay(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp, vertical = 24.dp),
+                    .padding(horizontal = 16.dp, vertical = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = Color(0xFF182E22),
-                    border = BorderStroke(1.dp, Color(0xFF2CEB7E))
+
+                // ── App name badge ──
+                Box(
+                    modifier = Modifier
+                        .border(2.dp, GBDarkest, RoundedCornerShape(4.dp))
+                        .background(GBLight, RoundedCornerShape(4.dp))
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = data.appName.uppercase(),
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+                        text = "[ ${data.appName.uppercase()} ]",
                         style = MaterialTheme.typography.labelLarge,
-                        color = Color(0xFF95FFBE),
-                        fontFamily = retroFont,
-                        letterSpacing = MaterialTheme.typography.labelLarge.letterSpacing
+                        color = GBDarkest
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(Modifier.height(14.dp))
 
+                // ── Title ──
                 Text(
-                    text = stringResource(id = R.string.overlay_pause_title).uppercase(),
+                    text = stringResource(R.string.overlay_pause_title).uppercase(),
                     style = MaterialTheme.typography.headlineSmall,
-                    color = Color(0xFFE5FFEF),
+                    color = GBDarkest,
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = retroFont
+                    fontWeight = FontWeight.Bold
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
 
+                // ── Custom message ──
                 Text(
                     text = data.customMessage,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Color(0xFFC6F3D7),
+                    color = GBDark,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    fontFamily = retroFont
+                    modifier = Modifier.padding(horizontal = 4.dp)
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(Modifier.height(16.dp))
 
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = Color(0xFF182E22),
-                    border = BorderStroke(1.dp, Color(0xFF2CEB7E).copy(alpha = 0.6f))
+                // ══ Main card — timer or intent check ══
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(2.dp, GBDarkest, RoundedCornerShape(4.dp))
+                        .background(GBLight, RoundedCornerShape(4.dp))
+                        .padding(14.dp)
                 ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(18.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        BreathingAnimation()
-                        Spacer(modifier = Modifier.height(14.dp))
-
                         if (!timerFinished) {
-                            CircularProgressIndicator(
-                                progress = {
-                                    if (data.cooldownSeconds > 0) {
-                                        timeRemaining.toFloat() / data.cooldownSeconds
-                                    } else 0f
-                                },
-                                modifier = Modifier.size(70.dp),
-                                color = Primary,
-                                trackColor = Color(0xFF254836),
-                                strokeWidth = 5.dp
-                            )
-                            Spacer(modifier = Modifier.height(10.dp))
+                            // ── Countdown ──
                             Text(
-                                text = "$timeRemaining",
-                                style = MaterialTheme.typography.headlineMedium,
-                                color = Color(0xFFE5FFEF),
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = retroFont
-                            )
-                            Text(
-                                text = stringResource(id = R.string.breathe),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color(0xFF95FFBE),
-                                fontFamily = retroFont
-                            )
-                        } else {
-                            Text(
-                                text = stringResource(id = R.string.intent_check_title).uppercase(),
+                                text = "BREATHE...",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = Color(0xFFE5FFEF),
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center,
-                                fontFamily = retroFont
+                                color = GBDarkest,
+                                fontWeight = FontWeight.Bold
                             )
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Text(
-                                text = stringResource(id = R.string.intent_check_hint, data.appName),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color(0xFFB1EBC8),
-                                textAlign = TextAlign.Center,
-                                fontFamily = retroFont
-                            )
-                            Spacer(modifier = Modifier.height(14.dp))
+                            Spacer(Modifier.height(10.dp))
 
-                            intents.chunked(2).forEach { rowIntents ->
+                            // Pixel-style countdown box
+                            Box(
+                                modifier = Modifier
+                                    .border(2.dp, GBDarkest, RoundedCornerShape(4.dp))
+                                    .background(GBLightest, RoundedCornerShape(4.dp))
+                                    .padding(horizontal = 24.dp, vertical = 12.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "$timeRemaining",
+                                    fontSize = 32.sp,
+                                    fontFamily = PixelFont,
+                                    fontWeight = FontWeight.Bold,
+                                    color = GBDarkest
+                                )
+                            }
+
+                            Spacer(Modifier.height(8.dp))
+
+                            // Simple progress bar
+                            val progress = if (data.cooldownSeconds > 0)
+                                timeRemaining.toFloat() / data.cooldownSeconds else 0f
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(10.dp)
+                                    .border(1.dp, GBDarkest, RoundedCornerShape(2.dp))
+                                    .background(GBLightest, RoundedCornerShape(2.dp))
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth(progress)
+                                        .height(10.dp)
+                                        .background(GBDarkest, RoundedCornerShape(2.dp))
+                                )
+                            }
+
+                        } else {
+                            // ── Intent check ──
+                            Text(
+                                text = stringResource(R.string.intent_check_title).uppercase(),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = GBDarkest,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                text = stringResource(R.string.intent_check_hint, data.appName),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = GBDark,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(Modifier.height(12.dp))
+
+                            intents.chunked(2).forEach { row ->
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                                 ) {
-                                    rowIntents.forEach { intentOption ->
-                                        IntentOptionCard(
-                                            label = intentOption.label,
-                                            countToday = data.intentCountsToday[intentOption.key] ?: 0,
-                                            isSelected = selectedIntent == intentOption.key,
-                                            onClick = { selectedIntent = intentOption.key },
-                                            fontFamily = retroFont,
+                                    row.forEach { opt ->
+                                        GBIntentChip(
+                                            label = opt.label,
+                                            count = data.intentCountsToday[opt.key] ?: 0,
+                                            selected = selectedIntent == opt.key,
+                                            onClick = { selectedIntent = opt.key },
                                             modifier = Modifier.weight(1f)
                                         )
                                     }
-                                    if (rowIntents.size == 1) {
-                                        Spacer(modifier = Modifier.weight(1f))
-                                    }
+                                    if (row.size == 1) Spacer(Modifier.weight(1f))
                                 }
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(Modifier.height(6.dp))
                             }
 
                             if (selectedIntent == null) {
                                 Text(
-                                    text = stringResource(id = R.string.intent_check_required),
+                                    text = "> ${stringResource(R.string.intent_check_required)}",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = Color(0xFFFFB4AB),
-                                    fontFamily = retroFont
+                                    color = GBDarkest
                                 )
                             }
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(Modifier.height(12.dp))
 
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = Color(0xFF182E22),
-                    border = BorderStroke(1.dp, Color(0xFF2CEB7E).copy(alpha = 0.35f))
+                // ══ Stats row ══
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(2.dp, GBDarkest, RoundedCornerShape(4.dp))
+                        .background(GBLight, RoundedCornerShape(4.dp))
+                        .padding(vertical = 10.dp, horizontal = 8.dp)
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 14.dp, horizontal = 10.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        OverlayStat(
-                            icon = Icons.Filled.Repeat,
-                            value = "${data.opensToday}",
-                            label = stringResource(id = R.string.overlay_opens_today_label),
-                            fontFamily = retroFont
-                        )
-                        OverlayStat(
-                            icon = Icons.Filled.AccessTime,
-                            value = TimeUtils.formatDuration(data.timeSpentTodayMs),
-                            label = stringResource(id = R.string.overlay_today_label),
-                            fontFamily = retroFont
-                        )
-                        OverlayStat(
-                            icon = Icons.Filled.Timeline,
-                            value = TimeUtils.formatDuration(data.timeSpentWeekMs),
-                            label = stringResource(id = R.string.overlay_this_week_label),
-                            fontFamily = retroFont
-                        )
+                        GBStat(Icons.Filled.Repeat, "${data.opensToday}", stringResource(R.string.overlay_opens_today_label))
+                        GBStat(Icons.Filled.AccessTime, TimeUtils.formatDuration(data.timeSpentTodayMs), stringResource(R.string.overlay_today_label))
+                        GBStat(Icons.Filled.Timeline, TimeUtils.formatDuration(data.timeSpentWeekMs), stringResource(R.string.overlay_this_week_label))
                     }
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(Modifier.height(16.dp))
 
+                // ── GO BACK button (primary action) ──
                 Button(
                     onClick = onGoBack,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(54.dp),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Secondary, contentColor = Color(0xFF07140C))
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = RoundedCornerShape(4.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = GBDarkest,
+                        contentColor = GBLightest
+                    ),
+                    border = BorderStroke(2.dp, GBDarkest)
                 ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(16.dp))
+                    Spacer(Modifier.width(6.dp))
                     Text(
-                        text = stringResource(id = R.string.go_back).uppercase(),
+                        text = stringResource(R.string.go_back).uppercase(),
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = retroFont
+                        fontWeight = FontWeight.Bold
                     )
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(Modifier.height(8.dp))
 
+                // ── CONTINUE button (secondary) ──
                 OutlinedButton(
                     onClick = { selectedIntent?.let(onContinue) },
                     enabled = timerFinished && selectedIntent != null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth().height(44.dp),
+                    shape = RoundedCornerShape(4.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFFE5FFEF)
+                        contentColor = GBDarkest,
+                        disabledContentColor = GBDark.copy(alpha = 0.5f)
                     ),
-                    border = BorderStroke(1.dp, Color(0xFF2CEB7E))
+                    border = BorderStroke(2.dp, if (timerFinished && selectedIntent != null) GBDarkest else GBDark.copy(alpha = 0.4f))
                 ) {
                     Text(
-                        text = stringResource(
-                            id = R.string.continue_nudge_format,
-                            data.nudgeAfterMinutes
-                        ),
+                        text = stringResource(R.string.continue_nudge_format, data.nudgeAfterMinutes).uppercase(),
                         style = MaterialTheme.typography.bodyMedium,
-                        fontFamily = retroFont,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -342,79 +329,49 @@ fun InterventionOverlay(
     }
 }
 
+// ── Stat column ──
 @Composable
-private fun OverlayStat(
-    icon: ImageVector,
-    value: String,
-    label: String,
-    fontFamily: FontFamily
-) {
+private fun GBStat(icon: ImageVector, value: String, label: String) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(3.dp)
+        verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = Color(0xFF95FFBE),
-            modifier = Modifier.size(16.dp)
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleSmall,
-            color = Color(0xFFE5FFEF),
-            fontWeight = FontWeight.Bold,
-            fontFamily = fontFamily
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = Color(0xFF9BD5B4),
-            fontFamily = fontFamily
-        )
+        Icon(icon, null, tint = GBDarkest, modifier = Modifier.size(14.dp))
+        Text(value, style = MaterialTheme.typography.titleSmall, color = GBDarkest, fontWeight = FontWeight.Bold)
+        Text(label, style = MaterialTheme.typography.labelSmall, color = GBDark)
     }
 }
 
-private data class IntentOption(
-    val key: String,
-    val label: String
-)
-
+// ── Intent chip — Game Boy button style ──
 @Composable
-private fun IntentOptionCard(
+private fun GBIntentChip(
     label: String,
-    countToday: Int,
-    isSelected: Boolean,
+    count: Int,
+    selected: Boolean,
     onClick: () -> Unit,
-    fontFamily: FontFamily,
     modifier: Modifier = Modifier
 ) {
-    val borderColor = if (isSelected) Color(0xFF2CEB7E) else Color(0xFF3A6B50)
-    val bgColor = if (isSelected) Color(0xFF1E3A2A) else Color(0xFF182E22)
+    val bg = if (selected) GBDarkest else GBLightest
+    val fg = if (selected) GBLightest else GBDarkest
+    val border = GBDarkest
 
-    Surface(
-        modifier = modifier.clickable(onClick = onClick),
-        shape = RoundedCornerShape(8.dp),
-        color = bgColor,
-        border = BorderStroke(1.dp, borderColor)
+    Box(
+        modifier = modifier
+            .clickable(onClick = onClick)
+            .border(2.dp, border, RoundedCornerShape(4.dp))
+            .background(bg, RoundedCornerShape(4.dp))
+            .padding(horizontal = 8.dp, vertical = 6.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp)
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
+            Text(label, style = MaterialTheme.typography.labelMedium, color = fg, fontWeight = FontWeight.Bold)
             Text(
-                text = label,
-                style = MaterialTheme.typography.labelMedium,
-                color = Color(0xFFE5FFEF),
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = stringResource(R.string.intent_count_for_app, countToday),
+                stringResource(R.string.intent_count_for_app, count),
                 style = MaterialTheme.typography.labelSmall,
-                color = Color(0xFF9BD5B4),
-                fontFamily = fontFamily
+                color = if (selected) GBLight else GBDark
             )
         }
     }
 }
+
+private data class IntentOption(val key: String, val label: String)
+

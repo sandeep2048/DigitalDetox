@@ -97,7 +97,7 @@ fun AppSelectorScreen(
 
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp),
+                shape = RoundedCornerShape(4.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.94f),
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f))
             ) {
@@ -178,7 +178,7 @@ fun AppSelectorScreen(
                 leadingIcon = {
                     Icon(Icons.Filled.Search, contentDescription = null)
                 },
-                shape = RoundedCornerShape(18.dp),
+                shape = RoundedCornerShape(4.dp),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -222,8 +222,8 @@ private fun SocialBlockCard(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, borderColor, RoundedCornerShape(10.dp)),
-        shape = RoundedCornerShape(10.dp),
+            .border(1.dp, borderColor, RoundedCornerShape(4.dp)),
+        shape = RoundedCornerShape(4.dp),
         color = bgColor
     ) {
         Row(
@@ -317,7 +317,7 @@ private fun AppRow(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp),
+        shape = RoundedCornerShape(4.dp),
         color = if (isMonitored)
             MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.34f)
         else

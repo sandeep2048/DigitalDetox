@@ -42,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -53,11 +54,17 @@ import androidx.compose.ui.unit.sp
 import com.sanson.digitaldetox.R
 import com.sanson.digitaldetox.data.db.entity.UsageLogEntity
 import com.sanson.digitaldetox.data.model.OverlayData
-import com.sanson.digitaldetox.ui.theme.GBDark
-import com.sanson.digitaldetox.ui.theme.GBDarkest
-import com.sanson.digitaldetox.ui.theme.GBLight
-import com.sanson.digitaldetox.ui.theme.GBLightest
+import com.sanson.digitaldetox.ui.theme.BrightWhite
+import com.sanson.digitaldetox.ui.theme.CoolLav
+import com.sanson.digitaldetox.ui.theme.DarkIndigo
+import com.sanson.digitaldetox.ui.theme.DeepVoid
+import com.sanson.digitaldetox.ui.theme.ElecPurple
+import com.sanson.digitaldetox.ui.theme.HotPink
+import com.sanson.digitaldetox.ui.theme.MidIndigo
+import com.sanson.digitaldetox.ui.theme.NeonCyan
+import com.sanson.digitaldetox.ui.theme.NeonYellow
 import com.sanson.digitaldetox.ui.theme.PixelFont
+import com.sanson.digitaldetox.ui.theme.SoftCyan
 import com.sanson.digitaldetox.util.TimeUtils
 import kotlinx.coroutines.delay
 
@@ -102,7 +109,7 @@ fun InterventionOverlay(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(GBLightest),
+            .background(Brush.verticalGradient(listOf(DeepVoid, Color(0xFF13112A), DeepVoid))),
         contentAlignment = Alignment.Center
     ) {
         AnimatedVisibility(
@@ -120,14 +127,14 @@ fun InterventionOverlay(
                 // ── App name badge ──
                 Box(
                     modifier = Modifier
-                        .border(2.dp, GBDarkest, RoundedCornerShape(4.dp))
-                        .background(GBLight, RoundedCornerShape(4.dp))
+                        .border(2.dp, NeonCyan, RoundedCornerShape(4.dp))
+                        .background(DarkIndigo, RoundedCornerShape(4.dp))
                         .padding(horizontal = 12.dp, vertical = 4.dp)
                 ) {
                     Text(
                         text = "[ ${data.appName.uppercase()} ]",
                         style = MaterialTheme.typography.labelLarge,
-                        color = GBDarkest
+                        color = BrightWhite
                     )
                 }
 
@@ -137,7 +144,7 @@ fun InterventionOverlay(
                 Text(
                     text = stringResource(R.string.overlay_pause_title).uppercase(),
                     style = MaterialTheme.typography.headlineSmall,
-                    color = GBDarkest,
+                    color = BrightWhite,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold
                 )
@@ -148,7 +155,7 @@ fun InterventionOverlay(
                 Text(
                     text = data.customMessage,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = GBDark,
+                    color = CoolLav,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 4.dp)
                 )
@@ -159,8 +166,8 @@ fun InterventionOverlay(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(2.dp, GBDarkest, RoundedCornerShape(4.dp))
-                        .background(GBLight, RoundedCornerShape(4.dp))
+                        .border(2.dp, NeonCyan, RoundedCornerShape(4.dp))
+                        .background(DarkIndigo, RoundedCornerShape(4.dp))
                         .padding(14.dp)
                 ) {
                     Column(
@@ -172,7 +179,7 @@ fun InterventionOverlay(
                             Text(
                                 text = "BREATHE...",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = GBDarkest,
+                                color = BrightWhite,
                                 fontWeight = FontWeight.Bold
                             )
                             Spacer(Modifier.height(10.dp))
@@ -180,8 +187,8 @@ fun InterventionOverlay(
                             // Pixel-style countdown box
                             Box(
                                 modifier = Modifier
-                                    .border(2.dp, GBDarkest, RoundedCornerShape(4.dp))
-                                    .background(GBLightest, RoundedCornerShape(4.dp))
+                                    .border(2.dp, NeonCyan, RoundedCornerShape(4.dp))
+                                    .background(DeepVoid, RoundedCornerShape(4.dp))
                                     .padding(horizontal = 24.dp, vertical = 12.dp),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -190,7 +197,7 @@ fun InterventionOverlay(
                                     fontSize = 32.sp,
                                     fontFamily = PixelFont,
                                     fontWeight = FontWeight.Bold,
-                                    color = GBDarkest
+                                    color = BrightWhite
                                 )
                             }
 
@@ -203,14 +210,14 @@ fun InterventionOverlay(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(10.dp)
-                                    .border(1.dp, GBDarkest, RoundedCornerShape(2.dp))
-                                    .background(GBLightest, RoundedCornerShape(2.dp))
+                                    .border(1.dp, NeonCyan, RoundedCornerShape(2.dp))
+                                    .background(DeepVoid, RoundedCornerShape(2.dp))
                             ) {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth(progress)
                                         .height(10.dp)
-                                        .background(GBDarkest, RoundedCornerShape(2.dp))
+                                        .background(BrightWhite, RoundedCornerShape(2.dp))
                                 )
                             }
 
@@ -219,7 +226,7 @@ fun InterventionOverlay(
                             Text(
                                 text = stringResource(R.string.intent_check_title).uppercase(),
                                 style = MaterialTheme.typography.titleMedium,
-                                color = GBDarkest,
+                                color = BrightWhite,
                                 fontWeight = FontWeight.Bold,
                                 textAlign = TextAlign.Center
                             )
@@ -227,7 +234,7 @@ fun InterventionOverlay(
                             Text(
                                 text = stringResource(R.string.intent_check_hint, data.appName),
                                 style = MaterialTheme.typography.bodySmall,
-                                color = GBDark,
+                                color = CoolLav,
                                 textAlign = TextAlign.Center
                             )
                             Spacer(Modifier.height(12.dp))
@@ -255,7 +262,7 @@ fun InterventionOverlay(
                                 Text(
                                     text = "> ${stringResource(R.string.intent_check_required)}",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = GBDarkest
+                                    color = HotPink
                                 )
                             }
                         }
@@ -268,8 +275,8 @@ fun InterventionOverlay(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(2.dp, GBDarkest, RoundedCornerShape(4.dp))
-                        .background(GBLight, RoundedCornerShape(4.dp))
+                        .border(2.dp, NeonCyan, RoundedCornerShape(4.dp))
+                        .background(DarkIndigo, RoundedCornerShape(4.dp))
                         .padding(vertical = 10.dp, horizontal = 8.dp)
                 ) {
                     Row(
@@ -290,10 +297,10 @@ fun InterventionOverlay(
                     modifier = Modifier.fillMaxWidth().height(48.dp),
                     shape = RoundedCornerShape(4.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = GBDarkest,
-                        contentColor = GBLightest
+                        containerColor = HotPink,
+                        contentColor = BrightWhite
                     ),
-                    border = BorderStroke(2.dp, GBDarkest)
+                    border = BorderStroke(2.dp, HotPink)
                 ) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(16.dp))
                     Spacer(Modifier.width(6.dp))
@@ -313,10 +320,10 @@ fun InterventionOverlay(
                     modifier = Modifier.fillMaxWidth().height(44.dp),
                     shape = RoundedCornerShape(4.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = GBDarkest,
-                        disabledContentColor = GBDark.copy(alpha = 0.5f)
+                        contentColor = NeonCyan,
+                        disabledContentColor = CoolLav.copy(alpha = 0.5f)
                     ),
-                    border = BorderStroke(2.dp, if (timerFinished && selectedIntent != null) GBDarkest else GBDark.copy(alpha = 0.4f))
+                    border = BorderStroke(2.dp, if (timerFinished && selectedIntent != null) NeonCyan else CoolLav.copy(alpha = 0.4f))
                 ) {
                     Text(
                         text = stringResource(R.string.continue_nudge_format, data.nudgeAfterMinutes).uppercase(),
@@ -336,9 +343,9 @@ private fun GBStat(icon: ImageVector, value: String, label: String) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        Icon(icon, null, tint = GBDarkest, modifier = Modifier.size(14.dp))
-        Text(value, style = MaterialTheme.typography.titleSmall, color = GBDarkest, fontWeight = FontWeight.Bold)
-        Text(label, style = MaterialTheme.typography.labelSmall, color = GBDark)
+        Icon(icon, null, tint = NeonCyan, modifier = Modifier.size(14.dp))
+        Text(value, style = MaterialTheme.typography.titleSmall, color = BrightWhite, fontWeight = FontWeight.Bold)
+        Text(label, style = MaterialTheme.typography.labelSmall, color = CoolLav)
     }
 }
 
@@ -351,9 +358,9 @@ private fun GBIntentChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val bg = if (selected) GBDarkest else GBLightest
-    val fg = if (selected) GBLightest else GBDarkest
-    val border = GBDarkest
+    val bg = if (selected) ElecPurple else MidIndigo
+    val fg = if (selected) BrightWhite else BrightWhite
+    val border = if (selected) ElecPurple else NeonCyan.copy(alpha = 0.35f)
 
     Box(
         modifier = modifier
@@ -367,7 +374,7 @@ private fun GBIntentChip(
             Text(
                 stringResource(R.string.intent_count_for_app, count),
                 style = MaterialTheme.typography.labelSmall,
-                color = if (selected) GBLight else GBDark
+                color = if (selected) SoftCyan else NeonYellow
             )
         }
     }

@@ -2,35 +2,36 @@ package com.sanson.digitaldetox.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
-// Game Boy has ONE look — always the same 4-shade LCD palette
-private val GameBoyScheme = lightColorScheme(
-    primary = GBDarkest,
-    onPrimary = GBLightest,
-    primaryContainer = GBDark,
-    onPrimaryContainer = GBLightest,
-    secondary = GBDark,
-    onSecondary = GBLightest,
-    secondaryContainer = GBLight,
-    onSecondaryContainer = GBDarkest,
-    tertiary = GBDarkest,
-    onTertiary = GBLightest,
-    tertiaryContainer = GBDark,
-    onTertiaryContainer = GBLightest,
+// Synthwave — always dark, neon accents on OLED black
+private val SynthwaveScheme = darkColorScheme(
+    primary = NeonCyan,
+    onPrimary = DeepVoid,
+    primaryContainer = PrimaryContainer,
+    onPrimaryContainer = NeonCyan,
+    secondary = HotPink,
+    onSecondary = BrightWhite,
+    secondaryContainer = SecondaryContainer,
+    onSecondaryContainer = HotPink,
+    tertiary = NeonYellow,
+    onTertiary = DeepVoid,
+    tertiaryContainer = TertiaryContainer,
+    onTertiaryContainer = NeonYellow,
     error = ErrorColor,
-    onError = GBLightest,
-    errorContainer = GBLight,
-    onErrorContainer = GBDarkest,
-    background = GBLightest,
-    onBackground = GBDarkest,
-    surface = GBLight,
-    onSurface = GBDarkest,
-    surfaceVariant = GBLight,
-    onSurfaceVariant = GBDark,
-    outline = GBDark,
-    outlineVariant = GBDark.copy(alpha = 0.5f)
+    onError = BrightWhite,
+    errorContainer = ErrorContainer,
+    onErrorContainer = Color(0xFFFFCDD2),
+    background = DeepVoid,
+    onBackground = BrightWhite,
+    surface = DarkIndigo,
+    onSurface = BrightWhite,
+    surfaceVariant = MidIndigo,
+    onSurfaceVariant = CoolLav,
+    outline = NeonCyan.copy(alpha = 0.4f),
+    outlineVariant = MidIndigo
 )
 
 @Composable
@@ -38,9 +39,9 @@ fun DigitalDetoxTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    // Always Game Boy — ignore system dark/light
+    // Always synthwave dark — this IS the brand
     MaterialTheme(
-        colorScheme = GameBoyScheme,
+        colorScheme = SynthwaveScheme,
         typography = Typography,
         content = content
     )

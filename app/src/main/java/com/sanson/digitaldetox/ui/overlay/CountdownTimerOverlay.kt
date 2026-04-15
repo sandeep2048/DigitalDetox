@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sanson.digitaldetox.ui.theme.ErrorColor
+import com.sanson.digitaldetox.ui.theme.PixelFont
 import com.sanson.digitaldetox.ui.theme.Primary
 import kotlinx.coroutines.delay
 import java.util.Locale
@@ -43,7 +44,7 @@ fun CountdownTimerOverlay(
     // Key on totalSeconds so the state resets if the value changes on recomposition
     var secondsRemaining by remember(totalSeconds) { mutableIntStateOf(totalSeconds) }
     var callbackFired by remember(totalSeconds) { mutableStateOf(false) }
-    val retroFont = FontFamily.Monospace
+    val retroFont = PixelFont
 
     val progress by animateFloatAsState(
         targetValue = if (totalSeconds > 0) secondsRemaining.toFloat() / totalSeconds else 0f,

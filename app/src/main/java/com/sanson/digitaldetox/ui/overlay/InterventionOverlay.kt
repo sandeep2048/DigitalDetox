@@ -54,6 +54,7 @@ import com.sanson.digitaldetox.R
 import com.sanson.digitaldetox.data.db.entity.UsageLogEntity
 import com.sanson.digitaldetox.data.model.OverlayData
 import com.sanson.digitaldetox.ui.components.BreathingAnimation
+import com.sanson.digitaldetox.ui.theme.PixelFont
 import com.sanson.digitaldetox.ui.theme.Primary
 import com.sanson.digitaldetox.ui.theme.Secondary
 import com.sanson.digitaldetox.util.TimeUtils
@@ -70,7 +71,7 @@ fun InterventionOverlay(
     var selectedIntent by remember { mutableStateOf<String?>(null) }
     val timerFinished = timeRemaining <= 0
 
-    val retroFont = FontFamily.Monospace
+    val retroFont = PixelFont
     val intents = listOf(
         IntentOption(
             key = UsageLogEntity.INTENT_SUBCONSCIOUS,

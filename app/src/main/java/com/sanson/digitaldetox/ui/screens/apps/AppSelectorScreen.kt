@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sanson.digitaldetox.ui.theme.ErrorColor
 import com.sanson.digitaldetox.ui.theme.PrimaryDark
+import com.sanson.digitaldetox.ui.theme.RetroBackgroundBrush
 import com.sanson.digitaldetox.ui.theme.Secondary
 import com.sanson.digitaldetox.util.Constants
 
@@ -71,9 +72,7 @@ fun AppSelectorScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFF090A16), Color(0xFF0E1020), MaterialTheme.colorScheme.background)
-                )
+                RetroBackgroundBrush
             )
             .padding(horizontal = 20.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -98,9 +97,9 @@ fun AppSelectorScreen(
 
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.82f),
-                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f))
+                shape = RoundedCornerShape(10.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.94f),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f))
             ) {
                 Column(
                     modifier = Modifier
@@ -183,9 +182,9 @@ fun AppSelectorScreen(
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = Color.White.copy(alpha = 0.10f),
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
+                    unfocusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f),
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f)
                 )
             )
 
@@ -213,7 +212,7 @@ private fun SocialBlockCard(
     isEnabled: Boolean,
     onToggle: (Boolean) -> Unit
 ) {
-    val borderColor = if (isEnabled) Secondary else Color.White.copy(alpha = 0.06f)
+    val borderColor = if (isEnabled) Secondary else MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
     val bgColor = if (isEnabled) {
         Secondary.copy(alpha = 0.10f)
     } else {
@@ -223,8 +222,8 @@ private fun SocialBlockCard(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, borderColor, RoundedCornerShape(18.dp)),
-        shape = RoundedCornerShape(18.dp),
+            .border(1.dp, borderColor, RoundedCornerShape(10.dp)),
+        shape = RoundedCornerShape(10.dp),
         color = bgColor
     ) {
         Row(
@@ -302,7 +301,7 @@ private fun SocialBlockCard(
                     checkedThumbColor = Secondary,
                     checkedTrackColor = Secondary.copy(alpha = 0.35f),
                     uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
+                    uncheckedTrackColor = MaterialTheme.colorScheme.surface
                 )
             )
         }
@@ -318,12 +317,12 @@ private fun AppRow(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(10.dp),
         color = if (isMonitored)
             MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.34f)
         else
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.62f),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = if (isMonitored) 0.09f else 0.05f))
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.92f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = if (isMonitored) 0.45f else 0.22f))
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),

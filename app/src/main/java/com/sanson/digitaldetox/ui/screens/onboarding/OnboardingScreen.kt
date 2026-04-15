@@ -3,6 +3,7 @@ package com.sanson.digitaldetox.ui.screens.onboarding
 import android.app.AppOpsManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Process
 import android.provider.Settings
 import androidx.compose.animation.AnimatedContent
@@ -22,13 +23,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.QueryStats
-import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -52,6 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sanson.digitaldetox.ui.components.BreathingAnimation
 import com.sanson.digitaldetox.ui.components.PermissionCard
+import com.sanson.digitaldetox.ui.theme.RetroBackgroundBrush
 import kotlinx.coroutines.delay
 
 @Composable
@@ -80,7 +80,7 @@ fun OnboardingScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(RetroBackgroundBrush)
             .padding(24.dp)
     ) {
         // Progress indicators
@@ -138,7 +138,8 @@ fun OnboardingScreen(
                 OutlinedButton(
                     onClick = { currentStep-- },
                     modifier = Modifier.weight(1f).height(56.dp),
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(10.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f))
                 ) {
                     Text("Back")
                 }
@@ -156,7 +157,11 @@ fun OnboardingScreen(
                     }
                 },
                 modifier = Modifier.weight(1f).height(56.dp),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
                 enabled = when (currentStep) {
                     1 -> hasAccessibility && hasOverlay && hasUsageStats
                     else -> true
@@ -340,10 +345,20 @@ private fun isAccessibilityEnabled(context: Context): Boolean {
 
 private fun hasUsageStatsPermission(context: Context): Boolean {
     val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
-    val mode = appOps.unsafeCheckOpNoThrow(
-        AppOpsManager.OPSTR_GET_USAGE_STATS,
-        Process.myUid(),
-        context.packageName
-    )
+    @Suppress("DEPRECATION")
+    val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        appOps.unsafeCheckOpNoThrow(
+            AppOpsManager.OPSTR_GET_USAGE_STATS,
+            Process.myUid(),
+            context.packageName
+        )
+    } else {
+        @Suppress("DEPRECATION")
+        appOps.checkOpNoThrow(
+            AppOpsManager.OPSTR_GET_USAGE_STATS,
+            Process.myUid(),
+            context.packageName
+        )
+    }
     return mode == AppOpsManager.MODE_ALLOWED
 }

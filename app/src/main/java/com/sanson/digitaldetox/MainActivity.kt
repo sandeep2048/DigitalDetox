@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
         val prefs = PreferenceManager(applicationContext)
 
         setContent {
-            DigitalDetoxTheme {
+            DigitalDetoxTheme(darkTheme = true) {
                 val navController = rememberNavController()
                 val scope = rememberCoroutineScope()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()

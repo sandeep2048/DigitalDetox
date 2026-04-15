@@ -43,13 +43,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sanson.digitaldetox.data.db.entity.CustomMessageEntity
+import com.sanson.digitaldetox.ui.theme.RetroBackgroundBrush
 
 @Composable
 fun MessageEditorScreen(
@@ -74,11 +73,7 @@ fun MessageEditorScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(Color(0xFF090A16), Color(0xFF101224), MaterialTheme.colorScheme.background)
-                    )
-                )
+                .background(RetroBackgroundBrush)
                 .padding(padding)
         ) {
             Column(
@@ -105,9 +100,9 @@ fun MessageEditorScreen(
 
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(24.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.80f),
-                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f))
+                    shape = RoundedCornerShape(10.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.94f),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f))
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 18.dp, vertical = 16.dp),
@@ -177,13 +172,13 @@ private fun MessageCard(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(10.dp),
         color = if (message.isActive) {
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.78f)
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.94f)
         } else {
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.78f)
         },
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f))
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -268,9 +263,9 @@ private fun EmptyMessagesState() {
         contentAlignment = Alignment.Center
     ) {
         Surface(
-            shape = RoundedCornerShape(24.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.75f),
-            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f))
+            shape = RoundedCornerShape(10.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.94f),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f))
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -332,9 +327,9 @@ private fun AddMessageDialog(
                     shape = RoundedCornerShape(14.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.20f)
+                        unfocusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f),
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f)
                     )
                 )
 

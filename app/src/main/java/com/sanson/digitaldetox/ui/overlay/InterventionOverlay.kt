@@ -106,7 +106,7 @@ fun InterventionOverlay(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFF050609), Color(0xFF0B1A12), Color(0xFF050609))
+                    colors = listOf(Color(0xFF060C09), Color(0xFF0E1E14), Color(0xFF060C09))
                 )
             ),
         contentAlignment = Alignment.Center
@@ -124,7 +124,7 @@ fun InterventionOverlay(
             ) {
                 Surface(
                     shape = RoundedCornerShape(10.dp),
-                    color = Color(0xFF10251A),
+                    color = Color(0xFF182E22),
                     border = BorderStroke(1.dp, Color(0xFF2CEB7E))
                 ) {
                     Text(
@@ -163,7 +163,7 @@ fun InterventionOverlay(
 
                 Surface(
                     shape = RoundedCornerShape(10.dp),
-                    color = Color(0xFF0D1611),
+                    color = Color(0xFF182E22),
                     border = BorderStroke(1.dp, Color(0xFF2CEB7E).copy(alpha = 0.6f))
                 ) {
                     Column(
@@ -184,7 +184,7 @@ fun InterventionOverlay(
                                 },
                                 modifier = Modifier.size(70.dp),
                                 color = Primary,
-                                trackColor = Color(0xFF1E3A2A),
+                                trackColor = Color(0xFF254836),
                                 strokeWidth = 5.dp
                             )
                             Spacer(modifier = Modifier.height(10.dp))
@@ -258,7 +258,7 @@ fun InterventionOverlay(
 
                 Surface(
                     shape = RoundedCornerShape(10.dp),
-                    color = Color(0xFF0D1611),
+                    color = Color(0xFF182E22),
                     border = BorderStroke(1.dp, Color(0xFF2CEB7E).copy(alpha = 0.35f))
                 ) {
                     Row(
@@ -388,8 +388,8 @@ private fun IntentOptionCard(
     fontFamily: FontFamily,
     modifier: Modifier = Modifier
 ) {
-    val borderColor = if (isSelected) Color(0xFF2CEB7E) else Color(0xFF2A4A37)
-    val bgColor = if (isSelected) Color(0xFF143325) else Color(0xFF0B1510)
+    val borderColor = if (isSelected) Color(0xFF2CEB7E) else Color(0xFF3A6B50)
+    val bgColor = if (isSelected) Color(0xFF1E3A2A) else Color(0xFF182E22)
 
     Surface(
         modifier = modifier.clickable(onClick = onClick),

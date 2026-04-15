@@ -24,11 +24,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sanson.digitaldetox.data.model.DailyStats
+import com.sanson.digitaldetox.ui.theme.PrimaryDark
 import com.sanson.digitaldetox.util.TimeUtils
 
 @Composable
@@ -74,7 +74,7 @@ fun UsageBarChart(
                         .width(28.dp)
                         .height(maxBarHeight)
                         .clip(RoundedCornerShape(10.dp))
-                        .background(Color.White.copy(alpha = 0.06f)),
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)),
                     contentAlignment = Alignment.BottomCenter
                 ) {
                     Box(
@@ -87,14 +87,14 @@ fun UsageBarChart(
                                     Brush.verticalGradient(
                                         listOf(
                                             MaterialTheme.colorScheme.primary,
-                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.75f)
+                                            PrimaryDark
                                         )
                                     )
                                 } else {
                                     Brush.verticalGradient(
                                         listOf(
-                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
-                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.22f)
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
                                         )
                                     )
                                 }

@@ -85,7 +85,7 @@ fun CountdownTimerOverlay(
 
     Surface(
         shape = RoundedCornerShape(10.dp),
-        color = Color(0xE60D1611),
+        color = Color(0xE6182E22),
         border = BorderStroke(1.dp, Color(0xFF2CEB7E).copy(alpha = 0.75f))
     ) {
         Row(
@@ -98,7 +98,7 @@ fun CountdownTimerOverlay(
                     progress = { progress },
                     modifier = Modifier.size(44.dp),
                     color = timerColor,
-                    trackColor = Color(0xFF1E3A2A),
+                    trackColor = Color(0xFF254836),
                     strokeWidth = 3.dp
                 )
                 Text(

@@ -41,6 +41,7 @@ import com.sanson.digitaldetox.ui.components.StatCard
 import com.sanson.digitaldetox.ui.components.UsageBarChart
 import com.sanson.digitaldetox.ui.theme.Primary
 import com.sanson.digitaldetox.ui.theme.PrimaryDark
+import com.sanson.digitaldetox.ui.theme.RetroBackgroundBrush
 import com.sanson.digitaldetox.ui.theme.Secondary
 import com.sanson.digitaldetox.ui.theme.Tertiary
 import com.sanson.digitaldetox.util.TimeUtils
@@ -59,9 +60,7 @@ fun DashboardScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFF090A16), Color(0xFF0F1122), MaterialTheme.colorScheme.background)
-                )
+                RetroBackgroundBrush
             )
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp)
@@ -90,9 +89,9 @@ fun DashboardScreen(
 
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(28.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.82f),
-            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f))
+            shape = RoundedCornerShape(12.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.94f),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f))
         ) {
             Box(
                 modifier = Modifier
@@ -164,9 +163,9 @@ fun DashboardScreen(
 
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(22.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.76f),
-            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f))
+            shape = RoundedCornerShape(10.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.94f),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
         ) {
             Box(modifier = Modifier.padding(18.dp)) {
                 if (state.weeklyStats.isNotEmpty()) {
@@ -201,9 +200,9 @@ fun DashboardScreen(
         } else {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f),
-                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f))
+                shape = RoundedCornerShape(10.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.92f),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
             ) {
                 Text(
                     text = "No monitored app sessions yet today.",
@@ -243,9 +242,9 @@ private fun SectionTitle(
 private fun AppBreakdownItem(appStat: AppUsageStats) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
+        shape = RoundedCornerShape(10.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.92f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.28f))
     ) {
         Row(
             modifier = Modifier.padding(16.dp),

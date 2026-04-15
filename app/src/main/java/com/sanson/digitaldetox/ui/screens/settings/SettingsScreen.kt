@@ -3,12 +3,12 @@ package com.sanson.digitaldetox.ui.screens.settings
 import android.app.AppOpsManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Process
 import android.provider.Settings
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,10 +22,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Accessibility
-import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.QueryStats
-import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -51,6 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sanson.digitaldetox.ui.components.PermissionCard
 import com.sanson.digitaldetox.ui.theme.Primary
 import com.sanson.digitaldetox.ui.theme.PrimaryDark
+import com.sanson.digitaldetox.ui.theme.RetroBackgroundBrush
 import com.sanson.digitaldetox.ui.theme.Secondary
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
@@ -86,9 +85,7 @@ fun SettingsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFF090A16), Color(0xFF101224), MaterialTheme.colorScheme.background)
-                )
+                RetroBackgroundBrush
             )
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp)
@@ -112,9 +109,9 @@ fun SettingsScreen(
 
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(28.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.82f),
-            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f))
+            shape = RoundedCornerShape(10.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.94f),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.38f))
         ) {
             Column(
                 modifier = Modifier
@@ -328,9 +325,9 @@ private fun SettingsSection(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(22.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.76f),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f))
+        shape = RoundedCornerShape(10.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.94f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
             Text(
@@ -363,7 +360,8 @@ private fun ToggleRow(
             .fillMaxWidth()
             .padding(vertical = 4.dp),
         shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.24f)
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.18f))
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -407,7 +405,8 @@ private fun SettingRow(
             .fillMaxWidth()
             .padding(vertical = 4.dp),
         shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.24f)
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.18f))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -440,10 +439,20 @@ private fun isAccessibilityEnabled(context: Context): Boolean {
 
 private fun hasUsageStatsPermission(context: Context): Boolean {
     val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
-    val mode = appOps.unsafeCheckOpNoThrow(
-        AppOpsManager.OPSTR_GET_USAGE_STATS,
-        Process.myUid(),
-        context.packageName
-    )
+    @Suppress("DEPRECATION")
+    val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        appOps.unsafeCheckOpNoThrow(
+            AppOpsManager.OPSTR_GET_USAGE_STATS,
+            Process.myUid(),
+            context.packageName
+        )
+    } else {
+        @Suppress("DEPRECATION")
+        appOps.checkOpNoThrow(
+            AppOpsManager.OPSTR_GET_USAGE_STATS,
+            Process.myUid(),
+            context.packageName
+        )
+    }
     return mode == AppOpsManager.MODE_ALLOWED
 }
